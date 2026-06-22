@@ -37,6 +37,60 @@
 	margin:10px;
 }
 
+/* ===== Barre de navigation du bas (phone-first) — auteur : Basile ===== */
+
+/* On réserve de la place en bas pour que le contenu ne passe pas sous la barre fixe */
+body {
+	padding-bottom:70px;
+}
+
+#barreBas {
+	position:fixed;
+	bottom:0; left:0; right:0;
+	display:flex;
+	height:58px;
+	background:#ffffff;
+	border-top:1px solid #e0e0e0;
+	box-shadow:0 -2px 8px rgba(0,0,0,0.06);
+	z-index:1000;
+}
+
+#barreBas a {
+	flex:1;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+	gap:3px;
+	text-decoration:none;
+	color:#8a8a8a;
+	font-size:11px;
+	font-family:-apple-system, system-ui, sans-serif;
+	/* on annule le float hérité de "#banniere a" au cas où */
+	float:none;
+	margin:0;
+}
+
+#barreBas a svg {
+	width:24px;
+	height:24px;
+}
+
+#barreBas a span {
+	line-height:1;
+}
+
+/* Onglet actif : mis en avant */
+#barreBas a.actif {
+	color:#1565c0;
+	font-weight:bold;
+}
+
+/* Retour visuel au toucher */
+#barreBas a:active {
+	background:#f2f2f2;
+}
+
 #corps {
 	border :1px solid black;
 	padding:20px;
@@ -49,6 +103,26 @@
 	margin:10px;
 }
 
+
+
+/*leagues*/
+
+
+
+#leagues { margin:10px; font-family:-apple-system, system-ui, sans-serif; }
+
+.league-new { display:flex; align-items:center; padding:12px 4px; border-bottom:1px solid #eee; }
+.league-new input { flex:1; border:none; font-size:16px; outline:none; padding:6px 0; }
+.btn-plus { border:none; background:none; font-size:26px; color:#1565c0; cursor:pointer; line-height:1; padding:0 6px; }
+
+.league-list { list-style:none; margin:0; padding:0; }
+.league-list li { border-bottom:1px solid #eee; }
+.league-list a { display:flex; justify-content:space-between; align-items:center;
+                 padding:14px 4px; text-decoration:none; color:#222; }
+.lg-nom { font-size:16px; }
+.lg-badge { color:#888; font-size:14px; }
+.league-list a:active { background:#f2f2f2; }
+.vide { padding:16px 4px; color:#999; }
 
 
 

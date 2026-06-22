@@ -10,16 +10,12 @@ if (basename($_SERVER["PHP_SELF"]) != "index.php")
 ?>
 
 <div id="pied">
+</div>
 
 <?php
-// Si l'utilisateur est connecte, on affiche un lien de deconnexion 
-if (valider("connecte","SESSION"))
-{
-	echo "Utilisateur <b>$_SESSION[pseudo]</b> connecté depuis <b>$_SESSION[heureConnexion]</b> &nbsp; "; 
-	echo "<a href=\"controleur.php?action=Logout\">Se Déconnecter</a>";
-}
+// Barre de navigation du bas (phone-first)
+include("templates/barre.php");
 ?>
-</div>
 
 </body>
 </html>

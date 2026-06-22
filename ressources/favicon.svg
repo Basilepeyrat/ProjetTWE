@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <circle cx="16" cy="16" r="15" fill="#ffffff" stroke="#222" stroke-width="2"/>
+  <!-- pentagone central -->
+  <polygon points="16,9 21,12.6 19,18.5 13,18.5 11,12.6" fill="#222"/>
+  <!-- petites pièces vers les bords -->
+  <polygon points="16,2 19,5 16,8 13,5" fill="#222"/>
+  <polygon points="28,12 30,16 26,18 24,14" fill="#222"/>
+  <polygon points="4,12 8,14 6,18 2,16" fill="#222"/>
+  <polygon points="11,26 14,22 17,24 16,29" fill="#222"/>
+  <polygon points="21,26 26,24 27,28 23,30" fill="#222"/>
+</svg>

@@ -97,7 +97,14 @@ session_start();
 				$qs = "?view=users&idLastUser=$idNewUser";
 			
 			break; 
+
 			
+			case 'Creer league' :
+					if ($nom = valider("nom")) {
+						creerLeague($nom, valider("idUser", "SESSION"));
+					}
+					$qs = "?view=leagues";
+				break;
 			
 			// Connexion //////////////////////////////////////////////////
 			case 'Connexion' :

@@ -20,7 +20,8 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 <head>	
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
 	<title>Chat'TWE 2026</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="icon" type="image/svg+xml" href="ressources/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=2">
 </head>
 <!-- **** F I N **** H E A D **** -->
 

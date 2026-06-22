@@ -86,8 +86,10 @@ function supprimerUtilisateur($idUser)
 function ajouterUtilisateur($pseudo,$passe)
 {
 	// cette fonction affecte le booléen "blacklist" à faux 
-	$SQL ="INSERT INTO users(pseudo,passe) VALUES ('$pseudo','$passe') ";
-	return SQLInsert($SQL); // renvoie l'id de l'utilisateur créé 
+	// Adapté au schéma ProjetTWE : table UTILISATEUR, colonne mot_de_passe.
+	// pdp est NOT NULL → on insère une chaîne vide par défaut.
+	$SQL ="INSERT INTO UTILISATEUR(pseudo, mot_de_passe, pdp) VALUES ('$pseudo','$passe','') ";
+	return SQLInsert($SQL); // renvoie l'id de l'utilisateur créé
 }
 
 /********* EXERCICE 4 *********/
@@ -99,7 +101,8 @@ function verifUserBdd($login,$passe)
 	// renvoie faux si user inconnu
 	// renvoie l'id de l'utilisateur si succès
 
-	$SQL = "SELECT id FROM users WHERE pseudo='$login' AND passe='$passe'";
+	// Adapté au schéma ProjetTWE : table UTILISATEUR, colonne mot_de_passe.
+	$SQL = "SELECT id FROM UTILISATEUR WHERE pseudo='$login' AND mot_de_passe='$passe'";
 
 	// On utilise SQLGetChamp
 	// si on avait besoin de plus d'un champ
@@ -112,9 +115,11 @@ function verifUserBdd($login,$passe)
 
 function isAdmin($idUser)
 {
-	$SQL = "SELECT admin FROM users WHERE id='$idUser'"; 
-	return SQLGetChamp($SQL);
-	// vérifie si l'utilisateur est un administrateur
+	// Le schéma ProjetTWE n'a pas (encore) de notion d'administrateur dans UTILISATEUR.
+	// On renvoie 0 pour ne pas planter sur une colonne inexistante.
+	// Si tu ajoutes une colonne `admin` à UTILISATEUR plus tard, remplace par :
+	//   $SQL = "SELECT admin FROM UTILISATEUR WHERE id='$idUser'"; return SQLGetChamp($SQL);
+	return 0;
 }
 
 /********* EXERCICE 5 *********/
@@ -201,4 +206,22 @@ function getConversation($idConv)
 	else return $listConversations[0];
 }
 
+
+function listerLeaguesUtilisateur($idUser)
+{
+	$SQL = "SELECT L.id, L.nom, L.createur_id, COUNT(Mtous.user_id) AS nb_membres
+			FROM LEAGUE L
+			JOIN MEMBRE_LEAGUE Mmoi  ON Mmoi.league_id = L.id AND Mmoi.user_id = '$idUser'
+			LEFT JOIN MEMBRE_LEAGUE Mtous ON Mtous.league_id = L.id
+			GROUP BY L.id, L.nom, L.createur_id
+			ORDER BY L.nom";
+	return parcoursRs(SQLSelect($SQL));
+}
+
+function creerLeague($nom, $idCreateur)
+{
+	$idLeague = SQLInsert("INSERT INTO LEAGUE(nom, createur_id) VALUES ('$nom', '$idCreateur')");
+	SQLInsert("INSERT INTO MEMBRE_LEAGUE(user_id, league_id) VALUES ('$idCreateur', '$idLeague')");
+	return $idLeague;
+}
 ?>

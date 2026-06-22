@@ -3,5 +3,5 @@
 $BDD_host="localhost";
 $BDD_user="admin"; // meme que phpmyadmin
 $BDD_password="mysql"; // meme que phpmyadmin
-$BDD_base="chatTWE"; // nom de la base de données
+$BDD_base="ProjetTWE"; // nom de la base de données
 ?>
