@@ -195,6 +195,54 @@ session_start();
 				}
 				$qs = "?view=conversations&idLastConv=$idNewConv";
 			break;
+
+			case 'Modifier equipe' :
+				if ($idUser = valider("idUser", "SESSION"))
+				if ($idEquipe = valider("idEquipe")) {
+					updateEquipePref($idUser, $idEquipe);
+					updateDrapeauEquipePref($idUser, $idEquipe);
+					$imageDrapeau = SQLGetChamp("SELECT image_drapeau FROM EQUIPE WHERE id='$idEquipe'");
+					$_SESSION["pdp"] = $imageDrapeau;
+				}
+				$qs = "?view=profil";
+			break;
+
+
+	        case 'Accepter invitation' :
+	            if ($idUser = valider("idUser", "SESSION"))
+	            if ($idInvitation = valider("idInvitation")) {
+	                accepterInvitation($idInvitation, $idUser);
+	            }
+	            $qs = "?view=profil";
+	        break;
+	
+	        case 'Refuser invitation' :
+	            if ($idUser = valider("idUser", "SESSION"))
+	            if ($idInvitation = valider("idInvitation")) {
+	                refuserInvitation($idInvitation, $idUser);
+	            }
+	            $qs = "?view=profil";
+	        break;
+
+
+			case 'Modifier pseudo' :
+	            if ($idUser = valider("idUser", "SESSION"))
+	            if ($pseudo = valider("pseudo")) {
+	                updatePseudo($idUser, $pseudo);
+	                $_SESSION["pseudo"] = $pseudo;
+	            }
+	            $qs = "?view=profil";
+	        break;
+
+	        case 'Modifier joueur' :
+	            if ($idUser = valider("idUser", "SESSION"))
+	            if ($idJoueur = valider("idJoueur")) {
+	                updateJoueurPref($idUser, $idJoueur);
+	            }
+	            $qs = "?view=profil";
+	        break;
+				
+			
 		}
 
 	}
