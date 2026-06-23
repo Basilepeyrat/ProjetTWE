@@ -125,7 +125,18 @@ body {
             font-size:11px; min-width:16px; height:16px; line-height:16px;
             text-align:center; border-radius:8px; padding:0 4px; }
 
+.chat-box { display:flex; flex-direction:column; gap:6px; padding:10px; }
 
+.msg { max-width:75%; padding:6px 10px; border-radius:14px; font-size:14px; word-wrap:break-word; }
+.msg-autre { align-self:flex-start; background:#eee; color:#222; }
+.msg-moi   { align-self:flex-end;   background:#1565c0; color:#fff; }
+
+.msg-auteur  { display:block; font-size:11px; font-weight:bold; color:#1565c0; margin-bottom:2px; }
+.msg-contenu { display:block; }
+
+.chat-form { display:flex; gap:8px; align-items:center; padding:8px 10px; border-top:1px solid #eee; }
+.chat-form input  { flex:1; border:1px solid #ccc; border-radius:18px; padding:8px 12px; font-size:14px; }
+.chat-form button { border:none; background:#1565c0; color:#fff; width:36px; height:36px; border-radius:50%; font-size:16px; }
 
 
 

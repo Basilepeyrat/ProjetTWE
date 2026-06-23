@@ -319,4 +319,13 @@ function refuserDemande($idInvitation)
 {
 	SQLUpdate("UPDATE INVITATION SET statut='refuse' WHERE id='$idInvitation'");
 }
+function listerMessagesLeagueDepuis($idLeague, $depuisId)
+{
+	$SQL = "SELECT MC.id, MC.contenu, MC.date_envoi, MC.user_id, U.pseudo
+			FROM MESSAGE_CHAT MC
+			JOIN UTILISATEUR U ON U.id = MC.user_id
+			WHERE MC.league_id = '$idLeague' AND MC.id > '$depuisId'
+			ORDER BY MC.id ASC";
+	return parcoursRs(SQLSelect($SQL));
+}
 ?>

@@ -21,7 +21,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
 	<title>Chat'TWE 2026</title>
 	<link rel="icon" type="image/svg+xml" href="ressources/favicon.svg">
-	<link rel="stylesheet" type="text/css" href="css/style.css?v=2">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=3">
 </head>
 <!-- **** F I N **** H E A D **** -->
 
