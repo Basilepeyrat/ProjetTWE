@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.5deb2
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Hôte : localhost:3306
--- Généré le : mar. 23 juin 2026 à 12:17
--- Version du serveur :  8.0.42-0ubuntu0.20.04.1
--- Version de PHP : 7.4.3-4ubuntu2.29
+-- Hôte : localhost
+-- Généré le : mar. 23 juin 2026 à 10:40
+-- Version du serveur : 9.3.0
+-- Version de PHP : 8.4.7
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -99,7 +98,7 @@ INSERT INTO `EQUIPE` (`id`, `nom`, `pays`, `poule`, `image_drapeau`) VALUES
 (16, 'Turquie', 'TUR', 'D', 'Turquie.svg'),
 (17, 'Allemagne', 'GER', 'E', 'Allemagne.svg'),
 (18, 'Curaçao', 'CUW', 'E', 'Curaçao.svg'),
-(19, "Côte d'Ivoire", 'CIV', 'E', "Côte_d'Ivoire.svg"),
+(19, 'Côte d\'Ivoire', 'CIV', 'E', 'Côte_d\'Ivoire.svg'),
 (20, 'Équateur', 'ECU', 'E', 'Équateur.svg'),
 (21, 'Pays-Bas', 'NED', 'F', 'Pays-Bas.svg'),
 (22, 'Japon', 'JPN', 'F', 'Japon.svg'),
@@ -216,7 +215,7 @@ INSERT INTO `JOUEUR` (`id`, `nom`, `prenom`, `equipe_id`, `poste`, `image_joueur
 (50, 'De Paul', 'Rodrigo', 37, 'MF', '50.png'),
 (51, 'Almada', 'Thiago', 37, 'MF', '51.png'),
 (52, 'Barco', 'Valentín', 37, 'DF,MF', '52.png'),
-(53, "O'Neill", 'Aiden', 15, 'MF', '53.png'),
+(53, 'O\'Neill', 'Aiden', 15, 'MF', '53.png'),
 (54, 'Hrustic', 'Ajdin', 15, 'MF', '54.png'),
 (55, 'Circati', 'Alessandro', 15, 'DF', '55.png'),
 (56, 'Mabil', 'Awer', 15, 'FW,MF', '56.png'),
@@ -440,7 +439,7 @@ INSERT INTO `JOUEUR` (`id`, `nom`, `prenom`, `equipe_id`, `poste`, `image_joueur
 (274, 'Epolo', 'Matthieu', 42, 'GK', '274.png'),
 (275, 'Elia', 'Meschak', 42, 'FW,MF', '275.png'),
 (276, 'Mbuku', 'Nathanaël', 42, 'MF', '276.png'),
-(277, 'Mukau', "Ngal'Ayel", 42, 'MF', '277.png'),
+(277, 'Mukau', 'Ngal\'Ayel', 42, 'MF', '277.png'),
 (278, 'Sadiki', 'Noah', 42, 'MF', '278.png'),
 (279, 'Moutoussamy', 'Samuel', 42, 'MF', '279.png'),
 (280, 'Banza', 'Simon', 42, 'FW,MF', '280.png'),
@@ -474,7 +473,7 @@ INSERT INTO `JOUEUR` (`id`, `nom`, `prenom`, `equipe_id`, `poste`, `image_joueur
 (308, 'Musa', 'Petar', 46, 'FW', '308.png'),
 (309, 'Sučić', 'Petar', 46, 'FW', '309.png'),
 (310, 'Fruk', 'Toni', 46, 'FW,MF', '310.png'),
-(311, 'Martha', "Ar'jany", 18, 'DF,FW', '311.png'),
+(311, 'Martha', 'Ar\'jany', 18, 'DF,FW', '311.png'),
 (312, 'Obispo', 'Armando', 18, 'DF', '312.png'),
 (313, 'Kuwas', 'Brandley', 18, 'FW,MF', '313.png'),
 (314, 'Fonville', 'Deveron', 18, 'DF', '314.png'),
@@ -542,7 +541,7 @@ INSERT INTO `JOUEUR` (`id`, `nom`, `prenom`, `equipe_id`, `poste`, `image_joueur
 (376, 'Seri', 'Jean', 19, 'MF', '376.png'),
 (377, 'Koné', 'Mohamed', 19, 'GK', '377.png'),
 (378, 'Pépé', 'Nicolas', 19, 'FW', '378.png'),
-(379, "N'Dicka", 'Obite', 19, 'DF', '379.png'),
+(379, 'N\'Dicka', 'Obite', 19, 'DF', '379.png'),
 (380, 'Kossounou', 'Odilon', 19, 'DF', '380.png'),
 (381, 'Diakité', 'Oumar', 19, 'FW', '381.png'),
 (382, 'Diomande', 'Ousmane', 19, 'DF', '382.png'),
@@ -625,7 +624,7 @@ INSERT INTO `JOUEUR` (`id`, `nom`, `prenom`, `equipe_id`, `poste`, `image_joueur
 (459, 'Guéhi', 'Marc', 45, 'DF', '459.png'),
 (460, 'Rashford', 'Marcus', 45, 'FW,MF', '460.png'),
 (461, 'Rogers', 'Morgan', 45, 'FW,MF', '461.png'),
-(462, "O'Reilly", 'Nico', 45, 'DF', '462.png'),
+(462, 'O\'Reilly', 'Nico', 45, 'DF', '462.png'),
 (463, 'Madueke', 'Noni', 45, 'MF', '463.png'),
 (464, 'Watkins', 'Ollie', 45, 'FW,MF', '464.png'),
 (465, 'James', 'Reece', 45, 'DF', '465.png'),
@@ -648,7 +647,7 @@ INSERT INTO `JOUEUR` (`id`, `nom`, `prenom`, `equipe_id`, `poste`, `image_joueur
 (482, 'Lacroix', 'Maxence', 33, 'DF', '482.png'),
 (483, 'Olise', 'Michael', 33, 'MF', '483.png'),
 (484, 'Maignan', 'Mike', 33, 'GK', '484.png'),
-(485, 'Kanté', "N'Golo", 33, 'MF', '485.png'),
+(485, 'Kanté', 'N\'Golo', 33, 'MF', '485.png'),
 (486, 'Dembélé', 'Ousmane', 33, 'MF', '486.png'),
 (487, 'Cherki', 'Rayan', 33, 'FW,MF', '487.png'),
 (488, 'Risser', 'Robin', 33, 'GK', '488.png'),
@@ -757,7 +756,7 @@ INSERT INTO `JOUEUR` (`id`, `nom`, `prenom`, `equipe_id`, `poste`, `image_joueur
 (591, 'Hardani', 'Saleh', 27, 'DF', '591.png'),
 (592, 'Ghoddos', 'Saman', 27, 'MF', '592.png'),
 (593, 'Moghanlou', 'Shahriar', 27, 'FW', '593.png'),
-(594, 'Khalilzadeh', "Shoja'", 27, 'DF', '594.png'),
+(594, 'Khalilzadeh', 'Shoja\'', 27, 'DF', '594.png'),
 (595, 'Basil', 'Ahmed', 35, 'GK', '595.png'),
 (596, 'Maknzi', 'Ahmed', 35, 'DF', '596.png'),
 (597, 'Qasem', 'Ahmed', 35, 'FW,MF', '597.png'),
@@ -1452,15 +1451,16 @@ CREATE TABLE `MATCHS` (
 CREATE TABLE `MEMBRE_LEAGUE` (
   `user_id` int NOT NULL,
   `league_id` int NOT NULL,
-  `date_adhesion` date DEFAULT (curdate())
+  `date_adhesion` date DEFAULT (curdate()),
+  `dernier_msg_lu` int NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `MEMBRE_LEAGUE`
 --
 
-INSERT INTO `MEMBRE_LEAGUE` (`user_id`, `league_id`, `date_adhesion`) VALUES
-(2, 1, '2026-06-23');
+INSERT INTO `MEMBRE_LEAGUE` (`user_id`, `league_id`, `date_adhesion`, `dernier_msg_lu`) VALUES
+(2, 1, '2026-06-23', 0);
 
 -- --------------------------------------------------------
 
