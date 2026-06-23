@@ -98,7 +98,15 @@ session_start();
 			
 			break; 
 
-			
+			case 'Envoyer message' :
+					$idLeague = valider("idLeague");
+					$contenu  = valider("contenu");
+					if ($idLeague && $contenu) {
+						enregistrerMessageLeague($idLeague, valider("idUser", "SESSION"), $contenu);
+					}
+					$qs = "?view=chat&idLeague=$idLeague";
+				break;
+
 			case 'Creer league' :
 					if ($nom = valider("nom")) {
 						creerLeague($nom, valider("idUser", "SESSION"));
@@ -106,6 +114,27 @@ session_start();
 					$qs = "?view=leagues";
 				break;
 			
+			case 'Demander a rejoindre' :
+					if ($idLeague = valider("idLeague")) {
+						demanderAdhesion(valider("idUser", "SESSION"), $idLeague);
+					}
+					$qs = "?view=leagues";
+				break;
+							case 'Accepter demande' :
+					$idLeague = valider("idLeague");
+					if ($idInvitation = valider("idInvitation")) {
+						accepterDemande($idInvitation);
+					}
+					$qs = "?view=demandes&idLeague=$idLeague";
+				break;
+
+				case 'Refuser demande' :
+					$idLeague = valider("idLeague");
+					if ($idInvitation = valider("idInvitation")) {
+						refuserDemande($idInvitation);
+					}
+					$qs = "?view=demandes&idLeague=$idLeague";
+				break;
 			// Connexion //////////////////////////////////////////////////
 			case 'Connexion' :
 

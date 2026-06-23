@@ -209,19 +209,114 @@ function getConversation($idConv)
 
 function listerLeaguesUtilisateur($idUser)
 {
-	$SQL = "SELECT L.id, L.nom, L.createur_id, COUNT(Mtous.user_id) AS nb_membres
+	$SQL = "SELECT L.id, L.nom, L.createur_id,
+				(SELECT COUNT(*) FROM MESSAGE_CHAT MC
+				 WHERE MC.league_id = L.id
+				   AND MC.id > Mmoi.dernier_msg_lu
+				   AND MC.user_id <> '$idUser') AS nb_non_lus
 			FROM LEAGUE L
-			JOIN MEMBRE_LEAGUE Mmoi  ON Mmoi.league_id = L.id AND Mmoi.user_id = '$idUser'
-			LEFT JOIN MEMBRE_LEAGUE Mtous ON Mtous.league_id = L.id
-			GROUP BY L.id, L.nom, L.createur_id
+			JOIN MEMBRE_LEAGUE Mmoi ON Mmoi.league_id = L.id AND Mmoi.user_id = '$idUser'
 			ORDER BY L.nom";
 	return parcoursRs(SQLSelect($SQL));
 }
+
+
+function apercuLeague($idLeague)
+{
+	$SQL = "SELECT L.id, L.nom, U.pseudo AS createur,
+				(SELECT COUNT(*) FROM MEMBRE_LEAGUE M WHERE M.league_id = L.id) AS nb_membres
+			FROM LEAGUE L
+			JOIN UTILISATEUR U ON U.id = L.createur_id
+			WHERE L.id = '$idLeague'";
+	$tab = parcoursRs(SQLSelect($SQL));
+	return count($tab) ? $tab[0] : false;
+}
+
 
 function creerLeague($nom, $idCreateur)
 {
 	$idLeague = SQLInsert("INSERT INTO LEAGUE(nom, createur_id) VALUES ('$nom', '$idCreateur')");
 	SQLInsert("INSERT INTO MEMBRE_LEAGUE(user_id, league_id) VALUES ('$idCreateur', '$idLeague')");
 	return $idLeague;
+}
+
+function demanderAdhesion($idUser, $idLeague)
+{
+	// Déjà membre ? on ne fait rien
+	$dejaMembre = SQLGetChamp("SELECT COUNT(*) FROM MEMBRE_LEAGUE
+	                           WHERE user_id='$idUser' AND league_id='$idLeague'");
+	if ($dejaMembre > 0) return "deja_membre";
+
+	// Demande déjà en attente ? on n'en recrée pas une deuxième
+	$dejaDemande = SQLGetChamp("SELECT COUNT(*) FROM INVITATION
+	                            WHERE user_invite_id='$idUser' AND league_id='$idLeague'
+	                              AND statut='en_attente'");
+	if ($dejaDemande > 0) return "deja_demande";
+
+	// Sinon : on crée la demande (statut 'en_attente' par défaut dans le schéma)
+	SQLInsert("INSERT INTO INVITATION(league_id, user_invite_id) VALUES ('$idLeague', '$idUser')");
+	return "ok";
+}
+
+
+function enregistrerMessageLeague($idLeague, $idUser, $contenu)
+{
+	SQLInsert("INSERT INTO MESSAGE_CHAT(league_id, user_id, contenu)
+	           VALUES ('$idLeague', '$idUser', '$contenu')");
+}
+
+function getLeague($idLeague)
+{
+	$SQL = "SELECT L.id, L.nom, L.createur_id, U.pseudo AS createur
+			FROM LEAGUE L
+			JOIN UTILISATEUR U ON U.id = L.createur_id
+			WHERE L.id = '$idLeague'";
+	$tab = parcoursRs(SQLSelect($SQL));
+	return count($tab) ? $tab[0] : false;
+}
+
+function listerMessagesLeague($idLeague)
+{
+	$SQL = "SELECT MC.id, MC.contenu, MC.date_envoi, MC.user_id, U.pseudo
+			FROM MESSAGE_CHAT MC
+			JOIN UTILISATEUR U ON U.id = MC.user_id
+			WHERE MC.league_id = '$idLeague'
+			ORDER BY MC.date_envoi ASC, MC.id ASC";
+	return parcoursRs(SQLSelect($SQL));
+}
+function marquerLeagueLue($idUser, $idLeague)
+{
+	$SQL = "UPDATE MEMBRE_LEAGUE
+			SET dernier_msg_lu = (SELECT IFNULL(MAX(id), 0) FROM MESSAGE_CHAT WHERE league_id = '$idLeague')
+			WHERE user_id = '$idUser' AND league_id = '$idLeague'";
+	SQLUpdate($SQL);
+}
+// Les demandes d'adhésion en attente d'une league (avec le pseudo du demandeur)
+function listerDemandesEnAttente($idLeague)
+{
+	$SQL = "SELECT I.id, I.user_invite_id, U.pseudo, I.date_invitation
+			FROM INVITATION I
+			JOIN UTILISATEUR U ON U.id = I.user_invite_id
+			WHERE I.league_id = '$idLeague' AND I.statut = 'en_attente'
+			ORDER BY I.date_invitation ASC";
+	return parcoursRs(SQLSelect($SQL));
+}
+
+// Accepter une demande : ajoute le membre + passe la demande à 'accepte'
+function accepterDemande($idInvitation)
+{
+	$tab = parcoursRs(SQLSelect("SELECT league_id, user_invite_id FROM INVITATION WHERE id='$idInvitation'"));
+	if (!count($tab)) return;
+	$d = $tab[0];
+	// INSERT IGNORE : si déjà membre, on ne plante pas (clé primaire user_id+league_id)
+	SQLInsert("INSERT IGNORE INTO MEMBRE_LEAGUE(user_id, league_id)
+	           VALUES ('".$d['user_invite_id']."', '".$d['league_id']."')");
+	SQLUpdate("UPDATE INVITATION SET statut='accepte' WHERE id='$idInvitation'");
+}
+
+// Refuser une demande : on passe juste son statut à 'refuse'
+function refuserDemande($idInvitation)
+{
+	SQLUpdate("UPDATE INVITATION SET statut='refuse' WHERE id='$idInvitation'");
 }
 ?>

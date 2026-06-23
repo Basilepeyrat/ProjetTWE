@@ -108,24 +108,22 @@ body {
 /*leagues*/
 
 
-
-#leagues { margin:10px; font-family:-apple-system, system-ui, sans-serif; }
-
-.league-new { display:flex; align-items:center; padding:12px 4px; border-bottom:1px solid #eee; }
-.league-new input { flex:1; border:none; font-size:16px; outline:none; padding:6px 0; }
-.btn-plus { border:none; background:none; font-size:26px; color:#1565c0; cursor:pointer; line-height:1; padding:0 6px; }
-
 .league-list { list-style:none; margin:0; padding:0; }
-.league-list li { border-bottom:1px solid #eee; }
-.league-list a { display:flex; justify-content:space-between; align-items:center;
-                 padding:14px 4px; text-decoration:none; color:#222; }
-.lg-nom { font-size:16px; }
-.lg-badge { color:#888; font-size:14px; }
-.league-list a:active { background:#f2f2f2; }
-.vide { padding:16px 4px; color:#999; }
 
+.league-row { display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:0.5px solid #eee; }
 
+.lg-avatar { width:36px; height:36px; border-radius:50%; background:#eee;
+             display:flex; align-items:center; justify-content:center;
+             font-weight:bold; color:#555; flex-shrink:0; }
 
+.lg-nom-lien { flex:1; text-decoration:none; color:#222; font-size:16px; }
+
+.lg-chat { position:relative; display:flex; align-items:center; color:#1565c0;
+           text-decoration:none; padding:4px; }
+
+.lg-badge { position:absolute; top:-4px; right:-6px; background:#e53935; color:#fff;
+            font-size:11px; min-width:16px; height:16px; line-height:16px;
+            text-align:center; border-radius:8px; padding:0 4px; }
 
 
 

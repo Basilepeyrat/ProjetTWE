@@ -1,64 +1,98 @@
 <?php
-
-// Si la page est appelée directement par son adresse, on redirige en passant pas la page index
-if (basename($_SERVER["PHP_SELF"]) != "index.php")
-{
-	header("Location:../index.php?view=chat&" . $_SERVER["QUERY_STRING"]);
-	// Il faut renvoyer le reste de la chaine de requete... 
-	// A SUIVRE : ne marche que pour requetes GET
-	// Un appel à http://localhost/chatISIG/templates/chat.php?idConv=2
-	// renvoie vers http://localhost/chatISIG/index.php?view=chat&idConv=2
-	
+// Page d'une league (dashboard + chat) — auteur : Basile
+if (basename($_SERVER["PHP_SELF"]) == "chat.php") {
+	header("Location:../index.php?view=leagues");
 	die("");
 }
 
 include_once("libs/modele.php");
 include_once("libs/maLibUtils.php");
-include_once("libs/maLibForms.php");
 include_once("libs/maLibSecurisation.php");
 
-// Page privée : accessible uniquement aux utilisateurs connectés
-securiser("login");
+securiser("login"); // page privée
 
-// On récupère l'id de la conversation à afficher, dans idConv
-$idConv = getValue("idConv");
-if (!$idConv)
-{
-	// pas d'identifiant ! On redirige vers la page de choix de la conversation
+$idUser   = valider("idUser", "SESSION");
+$idLeague = valider("idLeague");
+$league   = getLeague($idLeague);
 
-	// NB : pose quelques soucis car on a déjà envoyé la bannière... 
-	// Il y a opportunité d'écrire cette bannière plus tard si on la place en absolu
-	header("Location:index.php?view=conversations"); 
-	die("idConv manquant");
+if (!$league) {
+	echo '<p class="vide">League introuvable.</p>';
+	return; // stoppe le template ici, on revient à index.php
 }
-
-// On récupère les paramètres de la conversation
-$dataConv = getConversation($idConv); 
-if (!$dataConv)
-{
-	// La conversation n'existe pas ! 
-	header("Location:index.php?view=conversations");
-	die("La conversation n'existe pas ");
-}
-
-// Afficher le thème de la conversation courante
-tprint($dataConv);
-
-// Les messages 
-$messages = listerMessages($idConv);
-tprint($messages);
-
-// Ajout d'un message ?
-// Seulement si la conversation est active et si l'utilisateur est identifié ... 
-// Si la conversation est active, on écrit un peu de code javascript pour recharger la page régulièrement
 ?>
 
+<div class="page-entete">
+	<a class="retour" href="index.php?view=league&amp;idLeague=<?php echo $league['id']; ?>" aria-label="Retour">←</a>
+	<h1 class="lg-titre"><?php echo htmlspecialchars($league['nom']); ?> · chat</h1>
+</div>
+
+<div id="chat" class="chat-box">
+	<?php $messages = listerMessagesLeague($idLeague); ?>
+
+	<?php if (count($messages) == 0) : ?>
+		<p class="vide">Aucun message. Lance la conversation !</p>
+	<?php endif; ?>
+
+	<?php foreach ($messages as $msg) : ?>
+		<?php $estMoi = ($msg['user_id'] == $idUser); ?>
+		<div class="msg <?php echo $estMoi ? 'msg-moi' : 'msg-autre'; ?>">
+			<?php if (!$estMoi) : ?>
+				<span class="msg-auteur"><?php echo htmlspecialchars($msg['pseudo']); ?></span>
+			<?php endif; ?>
+			<span class="msg-contenu"><?php echo htmlspecialchars($msg['contenu']); ?></span>
+		</div>
+	<?php endforeach; ?>
+</div>
+<?php $dernierId = count($messages) ? $messages[count($messages) - 1]['id'] : 0; ?>
+
+<form class="chat-form" method="post" action="controleur.php">
+	<input type="hidden" name="idLeague" value="<?php echo $league['id']; ?>" />
+	<input type="text" name="contenu" placeholder="Écrire un message…" autocomplete="off" required="required" />
+	<button type="submit" name="action" value="Envoyer message" aria-label="Envoyer">➤</button>
+</form>
 
 
 
 
+<script>
+(function () {
+	var idLeague  = <?php echo (int) $idLeague; ?>;
+	var monId     = <?php echo (int) $idUser; ?>;
+	var dernierId = <?php echo (int) $dernierId; ?>;
+	var box = document.getElementById('chat');
 
+	function ajouter(m) {
+		var div = document.createElement('div');
+		div.className = 'msg ' + (m.user_id == monId ? 'msg-moi' : 'msg-autre');
+		if (m.user_id != monId) {
+			var a = document.createElement('span');
+			a.className = 'msg-auteur';
+			a.textContent = m.pseudo;
+			div.appendChild(a);
+		}
+		var c = document.createElement('span');
+		c.className = 'msg-contenu';
+		c.textContent = m.contenu;
+		div.appendChild(c);
+		box.appendChild(div);
+	}
 
+	function verifier() {
+		fetch('messages_json.php?idLeague=' + idLeague + '&depuis=' + dernierId)
+			.then(function (r) { return r.json(); })
+			.then(function (messages) {
+				messages.forEach(function (m) {
+					ajouter(m);
+					dernierId = m.id;        // on avance le repère
+				});
+				if (messages.length) box.scrollTop = box.scrollHeight;
+			});
+	}
+
+	setInterval(verifier, 3000);          // toutes les 3 s
+	box.scrollTop = box.scrollHeight;     // au chargement, on descend en bas
+})();
+</script>
 
 
 
