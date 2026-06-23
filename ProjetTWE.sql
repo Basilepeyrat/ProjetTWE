@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le : mar. 23 juin 2026 à 10:40
+-- Généré le : mar. 23 juin 2026 à 10:53
 -- Version du serveur : 9.3.0
 -- Version de PHP : 8.4.7
 
@@ -1488,15 +1488,16 @@ CREATE TABLE `UTILISATEUR` (
   `mot_de_passe` varchar(255) NOT NULL,
   `equipe_pref_id` int DEFAULT NULL,
   `joueur_pref_id` int DEFAULT NULL,
-  `pdp` varchar(255) NOT NULL
+  `pdp` varchar(255) NOT NULL,
+  `admin` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `UTILISATEUR`
 --
 
-INSERT INTO `UTILISATEUR` (`id`, `pseudo`, `mot_de_passe`, `equipe_pref_id`, `joueur_pref_id`, `pdp`) VALUES
-(2, 'hugo', 'hugo', 33, 42, 'France.svg');
+INSERT INTO `UTILISATEUR` (`id`, `pseudo`, `mot_de_passe`, `equipe_pref_id`, `joueur_pref_id`, `pdp`, `admin`) VALUES
+(2, 'hugo', 'hugo', 33, 42, 'France.svg', 0);
 
 --
 -- Index pour les tables déchargées
@@ -1616,7 +1617,7 @@ ALTER TABLE `JOUEUR`
 -- AUTO_INCREMENT pour la table `LEAGUE`
 --
 ALTER TABLE `LEAGUE`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `MATCHS`
