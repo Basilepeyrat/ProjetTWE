@@ -19,7 +19,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 <!-- **** H E A D **** -->
 <head>	
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
-	<title>Chat'TWE 2026</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/svg+xml" href="ressources/favicon.svg">
 	<link rel="stylesheet" type="text/css" href="css/style.css?v=3">
 </head>
@@ -31,24 +31,15 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 
 <div id="banniere">
 
-<div id="logo">
-<img src="ressources/ec-lille.png" />
-</div>
-
-<a href="index.php?view=accueil">Accueil</a>
 <?php
 // Le lien Utilisateurs n'est visible que pour les administrateurs
 if (valider("isAdmin","SESSION"))
 	echo '<a href="index.php?view=users">Utilisateurs</a>';
 ?>
-<a href="index.php?view=conversations">Conversations</a>
 
 <?php
 // Si l'utilisateur n'est pas connecte, on affiche un lien de connexion
 if (!valider("connecte","SESSION"))
 	echo "<a href=\"index.php?view=login\">Se connecter</a>";
 ?>
-
-<h1 id="stitre"> Chat'TWE 2026 </h1>
-
 </div>
