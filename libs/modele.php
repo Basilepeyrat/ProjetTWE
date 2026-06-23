@@ -328,4 +328,118 @@ function listerMessagesLeagueDepuis($idLeague, $depuisId)
 			ORDER BY MC.id ASC";
 	return parcoursRs(SQLSelect($SQL));
 }
+
+function getProfil($idUser)
+{
+    $SQL = "SELECT U.id, U.pseudo, U.pdp, U.equipe_pref_id, U.joueur_pref_id,
+				   E.nom AS equipe_nom, E.image_drapeau,
+				   J.prenom AS joueur_prenom, J.nom AS joueur_nom, J.image_joueur
+            FROM UTILISATEUR U
+            LEFT JOIN EQUIPE E ON E.id = U.equipe_pref_id
+            LEFT JOIN JOUEUR J ON J.id = U.joueur_pref_id
+            WHERE U.id = '$idUser'";
+    $rs = parcoursRs(SQLSelect($SQL));
+    return (count($rs) > 0) ? $rs[0] : false;
+}
+
+function getStatsProfil($idUser)
+{
+    // Nombre de matchs vus
+    $nbVus = SQLGetChamp("SELECT COUNT(*) FROM AVIS_MATCH WHERE user_id='$idUser' AND vu=1");
+    if (!$nbVus) $nbVus = 0;
+
+    // Joueur le plus nommé MVP
+    $SQL = "SELECT J.prenom, J.nom, COUNT(*) AS nb
+            FROM AVIS_MATCH A
+            JOIN JOUEUR J ON J.id = A.mvp_id
+            WHERE A.user_id='$idUser' AND A.mvp_id IS NOT NULL
+            GROUP BY A.mvp_id ORDER BY nb DESC LIMIT 1";
+    $rs = parcoursRs(SQLSelect($SQL));
+    $mvp = (count($rs) > 0) ? $rs[0]['prenom'] . ' ' . $rs[0]['nom'] : 'Aucun';
+
+    // Équipe la plus vue (matchs où l'équipe dom ou ext a été vue)
+    $SQL = "SELECT E.nom, COUNT(*) AS nb
+            FROM AVIS_MATCH A
+            JOIN MATCHS M ON M.id = A.match_id
+            JOIN EQUIPE E ON E.id = M.equipe_dom_id OR E.id = M.equipe_ext_id
+            WHERE A.user_id='$idUser' AND A.vu=1
+            GROUP BY E.id ORDER BY nb DESC LIMIT 1";
+    $rs = parcoursRs(SQLSelect($SQL));
+    $equipePlusVue = (count($rs) > 0) ? $rs[0]['nom'] : 'Aucune';
+
+    // Note moyenne donnée aux matchs
+    $noteMoy = SQLGetChamp("SELECT ROUND(AVG(note_match),1) FROM AVIS_MATCH WHERE user_id='$idUser' AND note_match IS NOT NULL");
+    if (!$noteMoy) $noteMoy = 'N/A';
+
+    // Présences au stade
+    $nbStade = SQLGetChamp("SELECT COUNT(*) FROM AVIS_MATCH WHERE user_id='$idUser' AND present_stade=1");
+    if (!$nbStade) $nbStade = 0;
+
+    return compact('nbVus', 'mvp', 'equipePlusVue', 'noteMoy', 'nbStade');
+}
+
+function getInvitationsProfil($idUser)
+{
+    $SQL = "SELECT I.id, L.nom AS league_nom, I.statut, I.date_invitation
+            FROM INVITATION I
+            JOIN LEAGUE L ON L.id = I.league_id
+            WHERE I.user_invite_id = '$idUser' AND I.statut = 'en_attente'
+            ORDER BY I.date_invitation DESC";
+    return parcoursRs(SQLSelect($SQL));
+}
+
+function updatePseudo($idUser, $pseudo)
+{
+    $SQL = "UPDATE UTILISATEUR SET pseudo='$pseudo' WHERE id='$idUser'";
+    return SQLUpdate($SQL);
+}
+
+function updateJoueurPref($idUser, $idJoueur)
+{
+    $SQL = "UPDATE UTILISATEUR SET joueur_pref_id='$idJoueur' WHERE id='$idUser'";
+    return SQLUpdate($SQL);
+}
+
+function updateEquipePref($idUser, $idEquipe)
+{
+    $SQL = "UPDATE UTILISATEUR SET equipe_pref_id='$idEquipe' WHERE id='$idUser'";
+    return SQLUpdate($SQL);
+}
+
+function listerJoueurs()
+{
+    $SQL = "SELECT J.id, J.prenom, J.nom, E.nom AS equipe
+            FROM JOUEUR J LEFT JOIN EQUIPE E ON E.id = J.equipe_id
+            ORDER BY J.nom, J.prenom";
+    return parcoursRs(SQLSelect($SQL));
+}
+
+function listerEquipes()
+{
+    $SQL = "SELECT id, nom FROM EQUIPE ORDER BY nom";
+    return parcoursRs(SQLSelect($SQL));
+}
+
+function accepterInvitation($idInvitation, $idUser)
+{
+    $league_id = SQLGetChamp("SELECT league_id FROM INVITATION WHERE id='$idInvitation' AND user_invite_id='$idUser'");
+    if ($league_id) {
+        SQLUpdate("UPDATE INVITATION SET statut='acceptee' WHERE id='$idInvitation'");
+        SQLInsert("INSERT IGNORE INTO MEMBRE_LEAGUE(user_id, league_id) VALUES ('$idUser', '$league_id')");
+    }
+}
+
+function refuserInvitation($idInvitation, $idUser)
+{
+    SQLUpdate("UPDATE INVITATION SET statut='refusee' WHERE id='$idInvitation' AND user_invite_id='$idUser'");
+}
+
+function updateDrapeauEquipePref($idUser, $idEquipe)
+{
+    $imageDrapeau = SQLGetChamp("SELECT image_drapeau FROM EQUIPE WHERE id='$idEquipe'");
+    $SQL = "UPDATE UTILISATEUR SET pdp='$imageDrapeau' WHERE id='$idUser'";
+    return SQLUpdate($SQL);
+}
+
+
 ?>
