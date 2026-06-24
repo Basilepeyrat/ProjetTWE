@@ -35,6 +35,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 // Le lien Utilisateurs n'est visible que pour les administrateurs
 if (valider("isAdmin","SESSION"))
 	echo '<a href="index.php?view=users">Utilisateurs</a>';
+	echo '<a href="index.php?view=users">Scores</a>';
 ?>
 
 <?php

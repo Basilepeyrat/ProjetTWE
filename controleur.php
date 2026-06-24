@@ -135,7 +135,9 @@ session_start();
 					}
 					$qs = "?view=demandes&idLeague=$idLeague";
 				break;
-			// Connexion //////////////////////////////////////////////////
+			
+			
+				// Connexion //////////////////////////////////////////////////
 			case 'Connexion' :
 
 				// TODO : afficher un message sur la page de connexion

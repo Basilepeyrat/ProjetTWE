@@ -16,7 +16,8 @@ function listerMatchs()
             JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
             JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id";
 
-    return SQLSelect($sql);
+    return parcoursRs(SQLSelect($sql));
+
 }
 
 
@@ -42,7 +43,7 @@ function getMatchById($id)
 //DEBUT EXERCICE 2
 function listerUtilisateurs($classe = "both")
 {
-	$SQL = "SELECT id,pseudo,blacklist,couleur,admin FROM users";
+	$SQL = "SELECT id,pseudo,blacklist,couleur,admin FROM utilisateurs";
 	
 	if ($classe == "bl") 
 		$SQL = $SQL . " WHERE blacklist=1";
