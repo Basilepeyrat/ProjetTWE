@@ -1,15 +1,39 @@
 <?php
 
-/*
-Dans ce fichier, on définit diverses fonctions permettant de récupérer des données utiles pour notre TP d'identification. Deux parties sont à compléter, en suivant les indications données dans le support de TP
-*/
-
-
-/********* EXERCICE 2 : prise en main de la base de données *********/
-
-
 // inclure ici la librairie faciliant les requêtes SQL (en veillant à interdire les inclusions multiples)
 include_once("libs/maLibSQL.pdo.php");
+
+
+function listerMatchs()
+{
+    $sql = "SELECT 
+                m.id,
+                e1.nom AS equipe_dom,
+                e2.nom AS equipe_ext,
+                m.score_dom,
+                m.score_ext
+            FROM MATCHS m
+            JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
+            JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id";
+
+    return SQLSelect($sql);
+}
+
+function getMatchById($id)
+{
+    $sql = "SELECT 
+                m.id,
+                e1.nom AS equipe_dom,
+                e2.nom AS equipe_ext,
+                m.score_dom,
+                m.score_ext
+            FROM MATCHS m
+            JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
+            JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id
+            WHERE m.id = $id";
+
+    return parcoursRS(SQLSelect($sql, true)); 
+}
 
 function listerUtilisateurs($classe = "both")
 {
