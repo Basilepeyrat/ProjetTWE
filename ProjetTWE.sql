@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : mer. 24 juin 2026 à 14:11
+-- Généré le : mer. 24 juin 2026 à 14:43
 -- Version du serveur :  8.0.42-0ubuntu0.20.04.1
 -- Version de PHP : 7.4.3-4ubuntu2.29
 
@@ -1588,16 +1588,17 @@ CREATE TABLE `UTILISATEUR` (
   `equipe_pref_id` int DEFAULT NULL,
   `joueur_pref_id` int DEFAULT NULL,
   `pdp` varchar(255) NOT NULL,
-  `admin` tinyint(1) NOT NULL DEFAULT '0'
+  `admin` tinyint(1) NOT NULL DEFAULT '0',
+  `blacklist` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `UTILISATEUR`
 --
 
-INSERT INTO `UTILISATEUR` (`id`, `pseudo`, `mot_de_passe`, `equipe_pref_id`, `joueur_pref_id`, `pdp`, `admin`) VALUES
-(1, 'basile', 'basile', 10, 1101, 'Maroc.svg', 1),
-(2, 'Hugo', 'hugo', 4, 1046, 'Tchéquie.svg', 0);
+INSERT INTO `UTILISATEUR` (`id`, `pseudo`, `mot_de_passe`, `equipe_pref_id`, `joueur_pref_id`, `pdp`, `admin`, `blacklist`) VALUES
+(1, 'basile', 'basile', 10, 1101, 'Maroc.svg', 1, 0),
+(2, 'Hugo', 'hugo', 32, 1171, 'Uruguay.svg', 0, 0);
 
 --
 -- Index pour les tables déchargées
