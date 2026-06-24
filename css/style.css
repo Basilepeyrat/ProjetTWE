@@ -231,7 +231,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .top-bar h1 { color: var(--color-on-primary); margin: 0; }
 .top-bar p { color: rgba(255,255,255,0.7); margin: 0; }
 
-//boutons
+
 
 .btn {
   display: inline-flex;
