@@ -2,19 +2,16 @@
 $equipes = listerEquipes();
 ?>
 
-<form method="get">
-    <input type="hidden" name="view" value="stats">
+<select id="equipeSelect">
+    <option value="">Choisir une équipe</option>
+    <?php foreach ($equipes as $e) { ?>
+        <option value="<?= $e['id'] ?>">
+            <?= $e['nom'] ?>
+        </option>
+    <?php } ?>
+</select>
 
-    <select name="equipe_id" onchange="this.form.submit()">
-        <option value="">Choisir une équipe</option>
-        <?php foreach ($equipes as $e) { ?>
-            <option value="<?= $e['id'] ?>"
-                <?= (isset($_GET['equipe_id']) && $_GET['equipe_id'] == $e['id']) ? "selected" : "" ?>>
-                <?= $e['nom'] ?>
-            </option>
-        <?php } ?>
-    </select>
-</form>
+<div id="stats"></div>
 
 <?php
 if (isset($_GET['equipe_id'])) {
@@ -52,3 +49,39 @@ if ($mvp) {
 </p>
 
 <?php } ?>
+
+
+<script src="js/jquery-4.0.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+
+$("#equipeSelect").change(function() {
+
+    let id = $(this).val();
+
+    if (id == "") return;
+
+    $.ajax({
+        url: "api/getStatsEquipe.php",
+        data: { equipe_id: id },
+        dataType: "json",
+        success: function(data) {
+
+            let html = `
+                <h2>Statistiques</h2>
+                <p>Matchs joués : ${data.joues}</p>
+                <p>Gagnés : ${data.gagnes}</p>
+                <p>Nuls : ${data.nuls}</p>
+                <p>Perdus : ${data.perdus}</p>
+                <p>Note moyenne : ${data.moyenne}</p>
+                <p>MVP : ${data.mvp}</p>
+            `;
+
+            $("#stats").html(html);
+        }
+    });
+
+});
+});
+</script>

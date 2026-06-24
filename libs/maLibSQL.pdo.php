@@ -1,14 +1,9 @@
 <?php
 
 // V1.0 du 18 mai 2018
+//MOdif 24/06 (adaptation api getStatsEquipe)
 
-if (file_exists("./config.php"))
-	include_once("./config.php");
-else if (file_exists("../libs/config.php"))
-	include_once "../libs/config.php";
-else if (file_exists("libs/config.php"))
-	include_once "libs/config.php";
-else die("Fichier config introuvable");
+include_once(__DIR__ . "/../config.php");
 
 /**
  * @file maLibSQL.php

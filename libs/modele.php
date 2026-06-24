@@ -1,7 +1,7 @@
 <?php
 
 // inclure ici la librairie faciliant les requêtes SQL (en veillant à interdire les inclusions multiples)
-include_once("libs/maLibSQL.pdo.php");
+include_once(__DIR__ . "/maLibSQL.pdo.php");
 
 //eleonore-debut
 function listerMatchs()
