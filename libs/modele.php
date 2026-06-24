@@ -39,6 +39,45 @@ function getMatchById($id)
 
 //eleonore-fin
 
+function getMatchs(int $userId, string $filtreEquipe = '', string $filtrePoule = ''): array {
+    global $pdo;
+
+    $sql = "
+        SELECT
+            m.id AS id_match,
+            m.date_match,
+            m.score_dom,
+            m.score_ext,
+            e1.poule,
+            e1.nom AS equipe_dom,
+            e2.nom AS equipe_ext,
+            ROUND(AVG(a.note_match), 1) AS note_moyenne,
+            -- Vérifie si l'utilisateur connecté a déjà noté ce match
+            MAX(CASE WHEN a.user_id = :user_id THEN 1 ELSE 0 END) AS deja_note
+        FROM MATCHS m
+        JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
+        JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id
+        LEFT JOIN AVIS_MATCH a ON a.match_id = m.id
+        WHERE 1=1
+    ";
+
+    $params = [':user_id' => $userId];
+
+    if ($filtreEquipe) {
+        $sql .= " AND (e1.nom LIKE :equipe OR e2.nom LIKE :equipe)";
+        $params[':equipe'] = '%' . $filtreEquipe . '%';
+    }
+    if ($filtrePoule) {
+        $sql .= " AND e1.poule = :poule";
+        $params[':poule'] = $filtrePoule;
+    }
+
+    $sql .= " GROUP BY m.id ORDER BY m.date_match DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
 
 //DEBUT EXERCICE 2
 function listerUtilisateurs($classe = "both")
@@ -388,6 +427,19 @@ function updateDrapeauEquipePref($idUser, $idEquipe)
     $imageDrapeau = SQLGetChamp("SELECT image_drapeau FROM EQUIPE WHERE id='$idEquipe'");
     $SQL = "UPDATE UTILISATEUR SET pdp='$imageDrapeau' WHERE id='$idUser'";
     return SQLUpdate($SQL);
+}
+
+function estConnecte(): bool {
+    return isset($_SESSION['id_utilisateur']);
+}
+
+function rediriger(string $page): void {
+    header("Location: $page");
+    exit;
+}
+
+function securiser(string $valeur): string {
+    return htmlspecialchars($valeur, ENT_QUOTES, 'UTF-8');
 }
 
 
