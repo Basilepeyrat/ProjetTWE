@@ -3,9 +3,10 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : mer. 24 juin 2026 à 13:17
--- Version du serveur : 8.4.9-0ubuntu0.26.04.1
--- Version de PHP : 8.5.4
+-- Généré le : mer. 24 juin 2026 à 14:43
+-- Version du serveur :  8.0.42-0ubuntu0.20.04.1
+-- Version de PHP : 7.4.3-4ubuntu2.29
+
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;

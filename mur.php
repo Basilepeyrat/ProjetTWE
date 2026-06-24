@@ -3,9 +3,9 @@
 // ============================================================
 
 // Compteurs dynamiques depuis la BDD
-$total_matchs = compterMatchs();
-$total_avis   = compterAvis();
-$total_users  = compterUtilisateurs();
+$total_avis   = $pdo->query("SELECT COUNT(*) FROM AVIS_MATCH")->fetchColumn();
+$total_matchs = $pdo->query("SELECT COUNT(*) FROM MATCHS")->fetchColumn();
+$total_users  = $pdo->query("SELECT COUNT(*) FROM UTILISATEUR")->fetchColumn();
 ?>
 
 <style>
