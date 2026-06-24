@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 4.9.5deb2
 -- https://www.phpmyadmin.net/
 --
--- Hôte : localhost
--- Généré le : mar. 23 juin 2026 à 10:53
--- Version du serveur : 9.3.0
--- Version de PHP : 8.4.7
+-- Hôte : localhost:3306
+-- Généré le : mer. 24 juin 2026 à 14:11
+-- Version du serveur :  8.0.42-0ubuntu0.20.04.1
+-- Version de PHP : 7.4.3-4ubuntu2.29
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -142,6 +143,14 @@ CREATE TABLE `INVITATION` (
   `statut` varchar(20) DEFAULT 'en_attente',
   `date_invitation` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `INVITATION`
+--
+
+INSERT INTO `INVITATION` (`id`, `league_id`, `user_invite_id`, `statut`, `date_invitation`) VALUES
+(1, 1, 1, 'acceptee', '2026-06-23 21:41:26'),
+(2, 6, 1, 'acceptee', '2026-06-23 21:42:07');
 
 -- --------------------------------------------------------
 
@@ -1424,7 +1433,8 @@ CREATE TABLE `LEAGUE` (
 --
 
 INSERT INTO `LEAGUE` (`id`, `nom`, `createur_id`) VALUES
-(1, 'CentraleCDM', 2);
+(1, 'CentraleCDM', 2),
+(6, 'MaLigue', 2);
 
 -- --------------------------------------------------------
 
@@ -1439,8 +1449,86 @@ CREATE TABLE `MATCHS` (
   `equipe_ext_id` int DEFAULT NULL,
   `score_dom` int DEFAULT '0',
   `score_ext` int DEFAULT '0',
-  `mvpfifa_id` int NOT NULL
+  `mvpfifa_id` int NOT NULL DEFAULT '-1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `MATCHS`
+--
+
+INSERT INTO `MATCHS` (`id`, `date_match`, `equipe_dom_id`, `equipe_ext_id`, `score_dom`, `score_ext`, `mvpfifa_id`) VALUES
+(1, '2026-06-11 13:00:00', 1, 2, 0, 0, 1015),
+(2, '2026-06-11 20:00:00', 3, 4, 0, 0, 675),
+(3, '2026-06-12 15:00:00', 5, 6, 0, 0, 134),
+(4, '2026-06-12 18:00:00', 13, 14, 0, 0, 1169),
+(5, '2026-06-13 21:00:00', 11, 12, 0, 0, 963),
+(6, '2026-06-13 12:00:00', 15, 16, 0, 0, 55),
+(7, '2026-06-13 18:00:00', 9, 10, 0, 0, 729),
+(8, '2026-06-13 12:00:00', 7, 8, 0, 0, 909),
+(9, '2026-06-14 18:00:00', 19, 20, 0, 0, 393),
+(10, '2026-06-14 12:00:00', 17, 18, 0, 0, 494),
+(11, '2026-06-14 15:00:00', 21, 22, 0, 0, 625),
+(12, '2026-06-14 21:00:00', 23, 24, 0, 0, 1065),
+(13, '2026-06-15 18:00:00', 27, 28, 0, 0, 781),
+(14, '2026-06-15 12:00:00', 29, 30, 0, 0, 1039),
+(15, '2026-06-15 15:00:00', 25, 26, 0, 0, 419),
+(16, '2026-06-15 21:00:00', 31, 32, 0, 0, 935),
+(17, '2026-06-16 15:00:00', 33, 34, 0, 0, 989),
+(18, '2026-06-16 18:00:00', 35, 36, 0, 0, 597),
+(19, '2026-06-16 20:00:00', 37, 38, 0, 0, 5),
+(20, '2026-06-16 12:00:00', 39, 40, 0, 0, 81),
+(21, '2026-06-17 12:00:00', 41, 42, 0, 0, 263),
+(22, '2026-06-17 15:00:00', 45, 46, 0, 0, 443),
+(23, '2026-06-17 18:00:00', 43, 44, 0, 0, 237),
+(24, '2026-06-17 21:00:00', 47, 48, 0, 0, 520),
+(25, '2026-06-18 13:00:00', 1, 3, 0, 0, 677),
+(26, '2026-06-18 12:00:00', 8, 6, 0, 0, 1091),
+(27, '2026-06-18 15:00:00', 5, 7, 0, 0, 911),
+(28, '2026-06-18 18:00:00', 4, 2, 0, 0, 339),
+(29, '2026-06-19 21:00:00', 9, 11, 0, 0, 547),
+(30, '2026-06-19 18:00:00', 12, 10, 0, 0, 961),
+(31, '2026-06-19 12:00:00', 13, 15, 0, 0, 57),
+(32, '2026-06-19 15:00:00', 16, 14, 0, 0, 1143),
+(33, '2026-06-20 19:00:00', 17, 19, 0, 0, 367),
+(34, '2026-06-20 19:00:00', 20, 18, 0, 0, 391),
+(35, '2026-06-20 12:00:00', 21, 23, 0, 0, 1067),
+(36, '2026-06-20 15:00:00', 24, 22, 0, 0, 1117),
+(37, '2026-06-21 15:00:00', 25, 27, 0, 0, 573),
+(38, '2026-06-21 12:00:00', 28, 26, 0, 0, 779),
+(39, '2026-06-21 18:00:00', 29, 31, 0, 0, 937),
+(40, '2026-06-21 21:00:00', 32, 30, 0, 0, 1195),
+(41, '2026-06-22 17:00:00', 33, 35, 0, 0, 599),
+(42, '2026-06-22 14:00:00', 36, 34, 0, 0, 805),
+(43, '2026-06-22 20:00:00', 37, 39, 0, 0, 83),
+(44, '2026-06-22 11:00:00', 40, 38, 0, 0, 649),
+(45, '2026-06-23 15:00:00', 41, 43, 0, 0, 1221),
+(46, '2026-06-23 19:00:00', 48, 46, 0, 0, 831),
+(47, '2026-06-23 12:00:00', 44, 42, 0, 0, 263),
+(48, '2026-06-23 21:00:00', 45, 47, 0, 0, 443),
+(49, '2026-06-24 18:00:00', 12, 9, 0, 0, -1),
+(50, '2026-06-24 18:00:00', 10, 11, 0, 0, -1),
+(51, '2026-06-24 19:00:00', 2, 3, 0, 0, -1),
+(52, '2026-06-24 19:00:00', 4, 1, 0, 0, -1),
+(53, '2026-06-25 18:00:00', 6, 5, 0, 0, -1),
+(54, '2026-06-25 18:00:00', 7, 8, 0, 0, -1),
+(55, '2026-06-25 16:00:00', 18, 19, 0, 0, -1),
+(56, '2026-06-25 16:00:00', 20, 17, 0, 0, -1),
+(57, '2026-06-25 19:00:00', 14, 15, 0, 0, -1),
+(58, '2026-06-25 19:00:00', 16, 13, 0, 0, -1),
+(59, '2026-06-26 18:00:00', 22, 23, 0, 0, -1),
+(60, '2026-06-26 18:00:00', 24, 21, 0, 0, -1),
+(61, '2026-06-26 15:00:00', 34, 35, 0, 0, -1),
+(62, '2026-06-26 15:00:00', 36, 33, 0, 0, -1),
+(63, '2026-06-26 20:00:00', 26, 27, 0, 0, -1),
+(64, '2026-06-26 20:00:00', 28, 25, 0, 0, -1),
+(65, '2026-06-27 17:00:00', 30, 31, 0, 0, -1),
+(66, '2026-06-27 17:00:00', 32, 29, 0, 0, -1),
+(67, '2026-06-27 17:00:00', 48, 45, 0, 0, -1),
+(68, '2026-06-27 17:00:00', 46, 47, 0, 0, -1),
+(69, '2026-06-27 20:00:00', 38, 39, 0, 0, -1),
+(70, '2026-06-27 20:00:00', 40, 37, 0, 0, -1),
+(71, '2026-06-27 19:30:00', 44, 41, 0, 0, -1),
+(72, '2026-06-27 19:30:00', 42, 43, 0, 0, -1);
 
 -- --------------------------------------------------------
 
@@ -1460,7 +1548,10 @@ CREATE TABLE `MEMBRE_LEAGUE` (
 --
 
 INSERT INTO `MEMBRE_LEAGUE` (`user_id`, `league_id`, `date_adhesion`, `dernier_msg_lu`) VALUES
-(2, 1, '2026-06-23', 0);
+(1, 1, '2026-06-23', 2),
+(1, 6, '2026-06-23', 0),
+(2, 1, '2026-06-23', 2),
+(2, 6, '2026-06-23', 0);
 
 -- --------------------------------------------------------
 
@@ -1475,6 +1566,14 @@ CREATE TABLE `MESSAGE_CHAT` (
   `contenu` text NOT NULL,
   `date_envoi` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `MESSAGE_CHAT`
+--
+
+INSERT INTO `MESSAGE_CHAT` (`id`, `league_id`, `user_id`, `contenu`, `date_envoi`) VALUES
+(1, 1, 2, 'salut !', '2026-06-23 17:18:23'),
+(2, 1, 1, 'ça marche ', '2026-06-23 21:41:56');
 
 -- --------------------------------------------------------
 
@@ -1497,7 +1596,8 @@ CREATE TABLE `UTILISATEUR` (
 --
 
 INSERT INTO `UTILISATEUR` (`id`, `pseudo`, `mot_de_passe`, `equipe_pref_id`, `joueur_pref_id`, `pdp`, `admin`) VALUES
-(2, 'hugo', 'hugo', 33, 42, 'France.svg', 0);
+(1, 'basile', 'basile', 10, 1101, 'Maroc.svg', 1),
+(2, 'Hugo', 'hugo', 4, 1046, 'Tchéquie.svg', 0);
 
 --
 -- Index pour les tables déchargées
@@ -1605,7 +1705,7 @@ ALTER TABLE `EQUIPE`
 -- AUTO_INCREMENT pour la table `INVITATION`
 --
 ALTER TABLE `INVITATION`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT pour la table `JOUEUR`
@@ -1617,19 +1717,19 @@ ALTER TABLE `JOUEUR`
 -- AUTO_INCREMENT pour la table `LEAGUE`
 --
 ALTER TABLE `LEAGUE`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT pour la table `MATCHS`
 --
 ALTER TABLE `MATCHS`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT pour la table `MESSAGE_CHAT`
 --
 ALTER TABLE `MESSAGE_CHAT`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT pour la table `UTILISATEUR`
