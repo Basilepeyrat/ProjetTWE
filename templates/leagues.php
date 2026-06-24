@@ -24,7 +24,7 @@ $leagues = listerLeaguesUtilisateur($idUser);
 	</form>
 	
 	<!-- rechercher une nouvelle league -->
-	<form class="league-search" method="get" action="index.php">
+	<form class="search" method="get" action="index.php">
 		<input type="hidden" name="view" value="leagues" />
 		<input type="text" name="rechercheLeague" placeholder="Rechercher une league" />
 		<button type="submit" class="btn-plus" aria-label="Rechercher">🔍</button>
