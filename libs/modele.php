@@ -525,7 +525,7 @@ function updateDrapeauEquipePref($idUser, $idEquipe)
 
 // pour afficher les match sur trois jours
 function listerMatchsTroisJours() {
-    global $pdo; 
+
     $sql = "SELECT 
                 m.id,
                 m.date_match,
@@ -536,11 +536,11 @@ function listerMatchsTroisJours() {
             FROM MATCHS m
             JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
             JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id
-            WHERE m.date_match BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 2 DAY)
+            WHERE m.date_match BETWEEN DATE_SUB(CURDATE(), INTERVAL 1 DAY) 
+                                  AND DATE_ADD(CURDATE(), INTERVAL 2 DAY)
             ORDER BY m.date_match ASC";
 
-    $stmt = $pdo->query($sql);
-    return $stmt->fetchAll();
+    return parcoursRS(SQLSelect($sql));
 }
 
 ?>
