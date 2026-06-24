@@ -3,7 +3,7 @@
 // inclure ici la librairie faciliant les requêtes SQL (en veillant à interdire les inclusions multiples)
 include_once("libs/maLibSQL.pdo.php");
 
-
+//eleonore-debut
 function listerMatchs()
 {
     $sql = "SELECT 
@@ -18,6 +18,7 @@ function listerMatchs()
 
     return SQLSelect($sql);
 }
+
 
 function getMatchById($id)
 {
@@ -35,6 +36,10 @@ function getMatchById($id)
     return parcoursRS(SQLSelect($sql, true)); 
 }
 
+//eleonore-fin
+
+
+//DEBUT EXERCICE 2
 function listerUtilisateurs($classe = "both")
 {
 	$SQL = "SELECT id,pseudo,blacklist,couleur,admin FROM users";
@@ -116,6 +121,8 @@ function ajouterUtilisateur($pseudo,$passe)
 	return SQLInsert($SQL); // renvoie l'id de l'utilisateur créé
 }
 
+//FIN EXERCICE 2
+
 /********* EXERCICE 4 *********/
 
 function verifUserBdd($login,$passe)
@@ -146,91 +153,8 @@ function isAdmin($idUser)
 	return 0;
 }
 
-/********* EXERCICE 5 *********/
-
-function listerConversations($mode="tout")
-{
-	// Liste toutes les conversations ($mode="tout")
-	// OU uniquement celles actives  ($mode="actives"), ou inactives  ($mode="inactives")
-	$SQL = "SELECT id, theme, active FROM conversations";
-	if ($mode == "actives")   $SQL .= " WHERE active=1";
-	if ($mode == "inactives") $SQL .= " WHERE active=0";
-	return parcoursRs(SQLSelect($SQL));
-}
-
-function archiverConversation($idConversation)
-{
-	// rend une conversation inactive
-	$SQL = "UPDATE conversations SET active=0 WHERE id='$idConversation'";
-	SQLUpdate($SQL);
-}
-
-function reactiverConversation($idConversation)
-{
-	// rend une conversation active
-	$SQL = "UPDATE conversations SET active=1 WHERE id='$idConversation'";
-	SQLUpdate($SQL);
-}
-
-function creerConversation($theme)
-{
-	// crée une nouvelle conversation et renvoie son identifiant
-	$SQL = "INSERT INTO conversations(theme, active) VALUES ('$theme', 1)";
-	return SQLInsert($SQL);
-}
-
-function supprimerConversation($idConv)
-{
-	// supprime une conversation et ses messages
-	// On supprime d'abord les messages associés (intégrité référentielle),
-	// puis la conversation elle-même
-	SQLDelete("DELETE FROM messages WHERE idConversation='$idConv'");
-	SQLDelete("DELETE FROM conversations WHERE id='$idConv'");
-}
-
-
-/********* EXERCICE 6 *********/
-
-function enregistrerMessage($idConversation, $idAuteur, $contenu)
-{
-	// Enregistre un message dans la base en encodant les caractères spéciaux HTML : <, > et & 
-	// pour interdire les messages HTML
-
-	
-}
-function listerMessages($idConv)
-{
-	// Liste les messages de cette conversation
-	// Champs à extraire : contenu, auteur, couleur 
-	// en ne renvoyant pas les utilisateurs blacklistés
-
-
-}
-
-function listerMessagesFromIndex($idConv,$index)
-{
-	// Liste les messages de cette conversation, 
-	// dont l'id est superieur à l'identifiant passé
-	// Champs à extraire : contenu, auteur, couleur 
-	// en ne renvoyant pas les utilisateurs blacklistés
-
-}
-
-function getConversation($idConv)
-{	
-	// Récupère les données de la conversation (theme, active)
-	$SQL = "SELECT theme, active FROM conversations WHERE id='$idConv'";
-	$listConversations = parcoursRs(SQLSelect($SQL));
-
-	// Attention : parcoursRS nous renvoie un tableau contenant potentiellement PLUSIEURS CONVERSATIONS
-	// Il faut renvoyer uniquement la première case de ce tableau, c'est à dire la case 0 
-	// OU false si la conversation n'existe pas
-	 
-	if (count($listConversations) == 0) return false;
-	else return $listConversations[0];
-}
-
-
+//FIN EXERCICE 4
+//Basile - début
 function listerLeaguesUtilisateur($idUser)
 {
 	$SQL = "SELECT L.id, L.nom, L.createur_id,
