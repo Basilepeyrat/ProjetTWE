@@ -543,12 +543,7 @@ function listerMatchsTroisJours() {
     return parcoursRS(SQLSelect($sql));
 }
 
-function listerEquipes() {
-    global $pdo;
-    $sql = "SELECT id, nom FROM EQUIPE ORDER BY nom";
-    $stmt = $pdo->query($sql);
-    return $stmt->fetchAll();
-}
+
 
 function inscrireUtilisateur($pseudo, $password, $equipeId, $joueurPrefere) {
     global $pdo;
