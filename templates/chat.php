@@ -1,3 +1,4 @@
+
 <?php
 // Page d'une league (dashboard + chat) — auteur : Basile
 if (basename($_SERVER["PHP_SELF"]) == "chat.php") {
@@ -53,51 +54,41 @@ if (!$league) {
 
 
 
-
 <script>
-(function () {
+$(function () {
 	var idLeague  = <?php echo (int) $idLeague; ?>;
 	var monId     = <?php echo (int) $idUser; ?>;
 	var dernierId = <?php echo (int) $dernierId; ?>;
-	var box = document.getElementById('chat');
+	var $box = $('#chat');
 
 	function ajouter(m) {
-		var div = document.createElement('div');
-		div.className = 'msg ' + (m.user_id == monId ? 'msg-moi' : 'msg-autre');
+		var $div = $('<div>').addClass('msg ' + (m.user_id == monId ? 'msg-moi' : 'msg-autre'));
 		if (m.user_id != monId) {
-			var a = document.createElement('span');
-			a.className = 'msg-auteur';
-			a.textContent = m.pseudo;
-			div.appendChild(a);
+			$('<span>').addClass('msg-auteur').text(m.pseudo).appendTo($div);
 		}
-		var c = document.createElement('span');
-		c.className = 'msg-contenu';
-		c.textContent = m.contenu;
-		div.appendChild(c);
-		box.appendChild(div);
+		$('<span>').addClass('msg-contenu').text(m.contenu).appendTo($div);
+		$box.append($div);
 	}
 
 	function verifier() {
-		fetch('messages_json.php?idLeague=' + idLeague + '&depuis=' + dernierId)
-			.then(function (r) { return r.json(); })
-			.then(function (messages) {
-				messages.forEach(function (m) {
-					ajouter(m);
-					dernierId = m.id;        // on avance le repère
-				});
-				if (messages.length) box.scrollTop = box.scrollHeight;
-			});
+		$.getJSON('messages_json.php', { idLeague: idLeague, depuis: dernierId }, function (messages) {
+			$.each(messages, function (i, m) { ajouter(m); dernierId = m.id; });
+			if (messages.length) $box.scrollTop($box[0].scrollHeight);
+		});
 	}
 
-	setInterval(verifier, 3000);          // toutes les 3 s
-	box.scrollTop = box.scrollHeight;     // au chargement, on descend en bas
-})();
+	// Envoi sans rechargement
+	$('.chat-form').on('submit', function (e) {
+		e.preventDefault();
+		var texte = $('input[name="contenu"]', this).val().trim();
+		if (!texte) return;
+		$.post('envoyer_message.php', { idLeague: idLeague, contenu: texte }, function () {
+			$('input[name="contenu"]').val('');
+			verifier();
+		});
+	});
+
+	setInterval(verifier, 3000);
+	$box.scrollTop($box[0].scrollHeight);
+});
 </script>
-
-
-
-
-
-
-
-

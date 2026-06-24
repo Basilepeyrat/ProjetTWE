@@ -7,15 +7,13 @@ include_once "libs/maLibSQL.pdo.php";
 include_once "libs/modele.php";
 include_once "libs/maLibSecurisation.php";
 
-// Doit être connecté
-if (!valider("connecte", "SESSION")) { echo "[]"; exit; }
+if (!valider("connecte", "SESSION")) { echo '{"ok":false}'; exit; }
 
 $idLeague = (int) valider("idLeague");
-$depuis   = (int) valider("depuis");
+$contenu  = valider("contenu");
 
-$messages = listerMessagesLeagueDepuis($idLeague, $depuis);
-
-marquerLeagueLue(valider("idUser", "SESSION"), $idLeague);
-
-echo json_encode($messages);
+if ($idLeague && $contenu) {
+	enregistrerMessageLeague($idLeague, valider("idUser", "SESSION"), $contenu);
+}
+echo '{"ok":true}';
 ?>
