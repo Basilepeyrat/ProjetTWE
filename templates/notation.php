@@ -24,7 +24,7 @@ include_once("libs/modele.php");
 if (isset($_POST['note'])) {
 
     $match_id = intval($_GET['id']);
-    $user_id = 2;
+    $user_id = valider("idUser", "SESSION");
 
     $note = intval($_POST['note']);
     $vu = isset($_POST['vu']) ? 1 : 0;
@@ -60,34 +60,11 @@ if (isset($_POST['note'])) {
 SQLInsert($sql);
 
     if (!empty($_POST['commentaire'])) {
-
-        $contenu = addslashes($_POST['commentaire']);
-        $date = date("Y-m-d H:i:s");
-
-        $sqlCheck = "SELECT * FROM COMMENTAIRE 
-                 WHERE user_id = $user_id AND match_id = $match_id";
-
-        $res = parcoursRS(SQLSelect($sqlCheck));
-
-        if (count($res) > 0) {
-
-        //on maj les données
-        $sql = "UPDATE COMMENTAIRE SET 
-            contenu = $contenu,
-            date = $date
-            WHERE user_id = $user_id AND match_id = $match_id";
-
-        }else{
-
-
-        $sql2 = "INSERT INTO COMMENTAIRE
-                (user_id, match_id, contenu, date_pub)
-                VALUES
-                ($user_id, $match_id, '$contenu', '$date')";
-        }
-
-        SQLInsert($sql2);
-    }
+    $contenu = addslashes($_POST['commentaire']);
+    $sql2 = "INSERT INTO COMMENTAIRE (user_id, match_id, contenu)
+             VALUES ($user_id, $match_id, '$contenu')";
+    SQLInsert($sql2);
+}
 
     echo "<p style='color:green;'>Avis enregistré !</p>";
 }
@@ -143,5 +120,28 @@ SQLInsert($sql);
     <input type="submit" value="Valider">
 
 </form>
+<h2>Commentaires</h2>
 
+<div id="commentaires">
+	<?php
+	$idMatch = (int) $id;
+	$commentaires = listerCommentaires($idMatch, 10, 0);
+	$total = compterCommentaires($idMatch);
+	?>
+
+	<?php foreach ($commentaires as $c) : ?>
+		<div class="msg msg-autre">
+			<span class="msg-auteur"><?php echo htmlspecialchars($c['pseudo']); ?></span>
+			<span class="msg-contenu"><?php echo htmlspecialchars($c['contenu']); ?></span>
+		</div>
+	<?php endforeach; ?>
+
+	<?php if (count($commentaires) == 0) : ?>
+		<p class="vide">Aucun commentaire pour ce match.</p>
+	<?php endif; ?>
+</div>
+
+<?php if ($total > 10) : ?>
+	<button id="voir-plus" data-offset="10" data-match="<?php echo $idMatch; ?>">Voir plus de commentaires</button>
+<?php endif; ?>
 </div>

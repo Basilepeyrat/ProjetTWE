@@ -252,6 +252,32 @@ function enregistrerMessageLeague($idLeague, $idUser, $contenu)
 	SQLInsert("INSERT INTO MESSAGE_CHAT(league_id, user_id, contenu)
 	           VALUES ('$idLeague', '$idUser', '$contenu')");
 }
+// 10 commentaires d'un match, du plus récent au plus ancien, avec décalage (pagination)
+function listerCommentaires($idMatch, $limite = 10, $debut = 0)
+{
+	$limite = (int) $limite; $debut = (int) $debut;
+	$SQL = "SELECT C.id, C.contenu, C.date_pub, C.user_id, U.pseudo
+			FROM COMMENTAIRE C
+			JOIN UTILISATEUR U ON U.id = C.user_id
+			WHERE C.match_id = '$idMatch'
+			ORDER BY C.id DESC
+			LIMIT $limite OFFSET $debut";
+	return parcoursRs(SQLSelect($SQL));
+}
+
+// nombre total (pour savoir s'il reste des commentaires à charger)
+function compterCommentaires($idMatch)
+{
+	return SQLGetChamp("SELECT COUNT(*) FROM COMMENTAIRE WHERE match_id = '$idMatch'");
+}
+
+// ajouter un commentaire
+function enregistrerCommentaire($idMatch, $idUser, $contenu)
+{
+	SQLInsert("INSERT INTO COMMENTAIRE(match_id, user_id, contenu)
+	           VALUES ('$idMatch', '$idUser', '$contenu')");
+}
+
 
 function getLeague($idLeague)
 {
@@ -428,19 +454,5 @@ function updateDrapeauEquipePref($idUser, $idEquipe)
     $SQL = "UPDATE UTILISATEUR SET pdp='$imageDrapeau' WHERE id='$idUser'";
     return SQLUpdate($SQL);
 }
-
-function estConnecte(): bool {
-    return isset($_SESSION['id_utilisateur']);
-}
-
-function rediriger(string $page): void {
-    header("Location: $page");
-    exit;
-}
-
-function securiser(string $valeur): string {
-    return htmlspecialchars($valeur, ENT_QUOTES, 'UTF-8');
-}
-
 
 ?>
