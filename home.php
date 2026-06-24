@@ -52,7 +52,7 @@ $stmt->execute($params);
 $matchs = $stmt->fetchAll();
 
 // Poules pour le filtre
-$poules = $pdo->query("SELECT DISTINCT poule FROM `match` ORDER BY poule")->fetchAll();
+$poules = $pdo->query("SELECT DISTINCT poule FROM EQUIPE WHERE poule IS NOT NULL ORDER BY poule")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
