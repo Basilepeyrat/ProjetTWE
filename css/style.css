@@ -556,7 +556,66 @@ a.match-link:hover .card {
 }
 
 
+/*affichage des matchs sur les 3 jours"
 
+.dashboard-matchs {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* style d'une des 3 colonnes */
+.colonne-matchs {
+    flex: 1;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+
+.colonne-matchs h2 {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+}
+
+/* style de chaque match*/
+.match-card {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.match-card:hover {
+    transform: translateY(-2px);
+}
+
+.match-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.match-time {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.no-match {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
 
 
 
