@@ -2,9 +2,8 @@
 
 include_once("libs/modele.php");
 
-//on recup ttes les équipes pour le choix de l'équipe que l'utilisateur supporte
-
-$equipes = $pdo->query("SELECT id, nom FROM EQUIPE ORDER BY nom")->fetchAll();
+// on récupère les équipes
+$equipes = listerEquipes();
 ?>
 
 <div id="corps">

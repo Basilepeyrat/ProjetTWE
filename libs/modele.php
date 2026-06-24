@@ -543,4 +543,31 @@ function listerMatchsTroisJours() {
     return parcoursRS(SQLSelect($sql));
 }
 
+function listerEquipes() {
+    global $pdo;
+    $sql = "SELECT id, nom FROM EQUIPE ORDER BY nom";
+    $stmt = $pdo->query($sql);
+    return $stmt->fetchAll();
+}
+
+function inscrireUtilisateur($pseudo, $password, $equipeId, $joueurPrefere) {
+    global $pdo;
+
+    // on sécurise le mdp
+    $passwordHache = password_hash($password, PASSWORD_DEFAULT);
+
+    
+    $sql = "INSERT INTO UTILISATEUR (pseudo, passe, equipe_id, joueur_prefere) 
+            VALUES (:pseudo, :passe, :equipe_id, :joueur_prefere)";
+
+    $stmt = $pdo->prepare($sql);
+    
+    return $stmt->execute([
+        ':pseudo'          => $pseudo,
+        ':passe'           => $passwordHache,
+        ':equipe_id'       => $equipeId,
+        ':joueur_prefere'  => $joueurPrefere
+    ]);
+}
+
 ?>
