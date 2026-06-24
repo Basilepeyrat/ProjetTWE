@@ -109,13 +109,6 @@ SQLInsert($sql);
     </label>
 
     <br><br>
-
-    <!-- Commentaire -->
-    <label>Commentaire :</label><br>
-    <textarea name="commentaire" rows="4" cols="40"></textarea>
-
-    <br><br>
-
     <input type="submit" value="Valider">
 
 </form>
