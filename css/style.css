@@ -465,6 +465,96 @@ ul { list-style: none; margin: 0; padding: 0; }
 .search button:active { transform: scale(0.96); }
 
 
+/*utiles pour le style de home*/
+
+/* Message de bienvenue */
+.welcome-msg {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-md);
+}
+.welcome-msg strong {
+  color: var(--color-primary);
+}
+
+/* style pour toutes les fonction search */
+.search {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+.search input[type="text"],
+.search select {
+  padding: 10px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.search input[type="text"] {
+  flex: 1;
+}
+.search button {
+  padding: 10px 16px;
+  background: var(--color-primary-light);
+  color: #ffffff; /* Le fameux blanc pur ! */
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* pour cliquer sur un match*/
+a.match-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+a.match-link:hover .card {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(18,44,86,0.14);
+}
+
+/* Séparation pour les dates */
+.match-date-header {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: var(--space-md) 0 var(--space-xs);
+}
+
+/* Alignement vertical*/
+.match-card__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+}
+
+.badge--empty {
+  background: #eeeeee;
+  color: #999999;
+}
+.badge--done {
+  background: rgba(46, 139, 87, 0.15);
+  color: var(--color-success);
+  font-size: 11px;
+}
+
+
+.match-card__meta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* Esi pas encore de résultat */
+.no-results {
+  text-align: center;
+  padding: var(--space-xl) var(--space-md);
+  color: var(--color-text-muted);
+}
+
 
 
 
