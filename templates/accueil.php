@@ -8,20 +8,20 @@
 <?php
 include_once("libs/modele.php");
 
-// 1. Récupération de tous les matchs des 3 jours (via la nouvelle fonction)
+// on récupère d'abord les matchs sur les trois jours qui nous interessent
 $tousLesMatchs = listerMatchsTroisJours();
 
-// 2. Préparation des paniers pour trier les matchs
+
 $matchsHier = [];
 $matchsAujourdhui = [];
 $matchsDemain = [];
 
-// Dates de repère (au format Y-m-d pour la comparaison)
+// pour trier les match suivant leur jour
 $hier = date('Y-m-d', strtotime('-1 day'));
 $aujourdhui = date('Y-m-d');
 $demain = date('Y-m-d', strtotime('+1 day'));
 
-// Tri automatique des matchs dans le bon panier
+
 foreach ($tousLesMatchs as $match) {
     $dateDuMatch = date('Y-m-d', strtotime($match['date_match']));
     
@@ -34,7 +34,7 @@ foreach ($tousLesMatchs as $match) {
     }
 }
 
-// Fonction utilitaire pour générer le code HTML d'une carte de match
+
 function afficherCarteMatch($match) {
     echo "<div class='match-card'>";
     echo "<a href='index.php?view=notation&id=".$match['id']."'>";
