@@ -36,6 +36,7 @@
 
 /* On réserve de la place en bas pour que le contenu ne passe pas sous la barre fixe */
 body {
+	padding-top:56px;
 	padding-bottom:70px;
 }
 
@@ -137,6 +138,36 @@ body {
 	bottom: 58px;            /* = hauteur de #barreBas, donc juste au-dessus */
 	padding: 10px;
 }
+#commentaires {
+	overflow-y: auto;                  /* la zone défile toute seule */
+	height: calc(100vh - 225px);       /* tout l'écran moins en-têtes + champ + barre */
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	bottom: 58px;            /* = hauteur de #barreBas, donc juste au-dessus */
+	padding: 10px;
+}
+
+
+#entete {
+	position: fixed; top:0; left:0; right:0;
+	height: 56px;
+	display: flex; align-items: center; gap: 12px;
+	padding: 0 14px;
+	background: #fff;
+	border-bottom: 1px solid #e0e0e0;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+	z-index: 1000;
+	font-family: -apple-system, system-ui, sans-serif;
+}
+.entete-pp { width:40px; height:40px; border-radius:50%; object-fit:cover; background:#eee; }
+.entete-info { display:flex; flex-direction:column; flex:1; }
+.entete-pseudo { font-weight:bold; font-size:15px; color:#222; }
+.entete-stat { font-size:12px; color:#888; }
+.entete-logout { font-size:20px; color:#888; text-decoration:none; }
+.entete-login { color:#1565c0; text-decoration:none; font-weight:bold; }
+
+
 .chat-form {
 	position: fixed;
 	left: 0;

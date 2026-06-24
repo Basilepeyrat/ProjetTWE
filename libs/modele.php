@@ -343,6 +343,8 @@ function listerMessagesLeagueDepuis($idLeague, $depuisId)
 	return parcoursRs(SQLSelect($SQL));
 }
 
+
+
 function getProfil($idUser)
 {
     $SQL = "SELECT U.id, U.pseudo, U.pdp, U.equipe_pref_id, U.joueur_pref_id,

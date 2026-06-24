@@ -22,7 +22,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/svg+xml" href="ressources/favicon.svg">
-	<link rel="stylesheet" type="text/css" href="css/style.css?v=3">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=5">
 	<script src="js/jquery-4.0.0.min.js"></script>
 </head>
 <!-- **** F I N **** H E A D **** -->
@@ -31,18 +31,29 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 <!-- **** B O D Y **** -->
 <body>
 
-<div id="banniere">
-
 <?php
-// Le lien Utilisateurs n'est visible que pour les administrateurs
-if (valider("isAdmin","SESSION"))
-	echo '<a href="index.php?view=users">Utilisateurs</a>';
-	echo '<a href="index.php?view=users">Scores</a>';
+include_once "libs/modele.php";
 ?>
-
-<?php
-// Si l'utilisateur n'est pas connecte, on affiche un lien de connexion
-if (!valider("connecte","SESSION"))
-	echo "<a href=\"index.php?view=login\">Se connecter</a>";
-?>
+<div id="entete">
+	<?php if (valider("connecte", "SESSION")) :
+		$idMoi  = valider("idUser", "SESSION");
+		$profil = getProfil($idMoi);
+		$stats  = getStatsProfil($idMoi);
+		$pp = $profil['pdp'] ? $profil['pdp'] : 'default.png';
+	?>
+		<img class="entete-pp" src="ressources/images_drapeaux/<?php echo htmlspecialchars($pp); ?>" alt="" />
+		<div class="entete-info">
+			<span class="entete-pseudo"><?php echo htmlspecialchars($profil['pseudo']); ?></span>
+			<span class="entete-stat"><?php echo (int) $stats['nbVus']; ?> matchs vus</span>
+		</div>
+		<a class="entete-logout" href="controleur.php?action=Logout" aria-label="Déconnexion">⎋</a>
+	<?php else : ?>
+		<a class="entete-login" href="index.php?view=login">Se connecter</a>
+	<?php endif; ?>
+	<?php
+	// Le lien Utilisateurs n'est visible que pour les administrateurs
+	if (valider("isAdmin","SESSION"))
+		echo '<a href="index.php?view=users">Utilisateurs</a>';
+		echo '<a href="index.php?view=users">Scores</a>';
+	?>
 </div>

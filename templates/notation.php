@@ -19,7 +19,6 @@ $nomMatch = $match['equipe_dom'] . " vs " . $match['equipe_ext'];
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include_once("libs/modele.php");
 
 if (isset($_POST['note'])) {
 
@@ -83,7 +82,7 @@ SQLInsert($sql);
 </h2>
 
 <!-- Formulaire -->
-<form method="post" action="">
+<form method="post" action="" >
 
     <!-- Note -->
     <label>Note du match :</label>
@@ -120,28 +119,36 @@ SQLInsert($sql);
     <input type="submit" value="Valider">
 
 </form>
+</div>
+
+
 <h2>Commentaires</h2>
+<?php
+$idMatch = (int) $id;
+$idUser  = valider("idUser", "SESSION");
+?>
 
-<div id="commentaires">
-	<?php
-	$idMatch = (int) $id;
-	$commentaires = listerCommentaires($idMatch, 10, 0);
-	$total = compterCommentaires($idMatch);
-	?>
-
-	<?php foreach ($commentaires as $c) : ?>
-		<div class="msg msg-autre">
-			<span class="msg-auteur"><?php echo htmlspecialchars($c['pseudo']); ?></span>
-			<span class="msg-contenu"><?php echo htmlspecialchars($c['contenu']); ?></span>
-		</div>
-	<?php endforeach; ?>
+<div id="commentaires" class="chat-box">
+	<?php $commentaires = array_reverse(listerCommentaires($idMatch, 100, 0)); ?>
 
 	<?php if (count($commentaires) == 0) : ?>
 		<p class="vide">Aucun commentaire pour ce match.</p>
 	<?php endif; ?>
+
+	<?php foreach ($commentaires as $c) : ?>
+		<?php $estMoi = ($c['user_id'] == $idUser); ?>
+		<div class="msg <?php echo $estMoi ? 'msg-moi' : 'msg-autre'; ?>">
+			<?php if (!$estMoi) : ?>
+				<span class="msg-auteur"><?php echo htmlspecialchars($c['pseudo']); ?></span>
+			<?php endif; ?>
+			<span class="msg-contenu"><?php echo htmlspecialchars($c['contenu']); ?></span>
+		</div>
+	<?php endforeach; ?>
 </div>
 
-<?php if ($total > 10) : ?>
-	<button id="voir-plus" data-offset="10" data-match="<?php echo $idMatch; ?>">Voir plus de commentaires</button>
-<?php endif; ?>
-</div>
+
+<form class="chat-form" method="post" action="controleur.php">
+	<input type="hidden" name="id" value="<?php echo $idMatch; ?>" />
+	<input type="text" name="contenu" placeholder="Écrire un commentaire…" autocomplete="off" required="required" />
+	<button type="submit" name="action" value="Envoyer commentaire" aria-label="Envoyer">➤</button>
+</form>

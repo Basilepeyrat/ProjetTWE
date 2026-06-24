@@ -35,6 +35,7 @@ session_start();
 			securiserAdmin("login");
 
 		// Un paramètre action a été soumis, on fait le boulot...
+	
 		switch($action)
 		{
 		
@@ -53,8 +54,18 @@ session_start();
 				// on transmet cette demande lors de la redirection
 				$qs = "?view=users&idLastUser=$idUser";
 				 
-			break; 
+			break;
 			
+			case 'Envoyer commentaire' :
+						$idMatch = valider("id");
+						$contenu = valider("contenu");
+						if ($idMatch && $contenu) {
+							enregistrerCommentaire($idMatch, valider("idUser", "SESSION"), $contenu);
+						}
+						$qs = "?view=notation&id=$idMatch";
+			break;
+
+
 			// Autoriser
 			case "Autoriser" : 
 				if ($idUser = valider("idUser")) {
