@@ -34,3 +34,26 @@ marquerLeagueLue($idUser, $idLeague);
 <a class="chat-acces" href="index.php?view=chat&amp;idLeague=<?php echo $league['id']; ?>">
 	💬 Ouvrir le chat
 </a>
+
+<?php
+$equipePref = getEquipePrefereeLeague($idLeague);
+$mvp = getMVPLigue($idLeague);
+$topViewer = getTopViewerLeague($idLeague);
+?>
+
+<h2>Statistiques de la league</h2>
+
+<p>
+Equipe favorite de la league :
+<?php echo $equipePref ? $equipePref['nom'] : "Aucune"; ?>
+</p>
+
+<p>
+MVP le plus choisi :
+<?php echo $mvp ? $mvp['prenom']." ".$mvp['nom'] : "Aucun"; ?>
+</p>
+
+<p>
+Utilisateur ayant vu le plus de matchs :
+<?php echo $topViewer ? $topViewer['pseudo']." (".$topViewer['nb']." matchs)" : "Aucun"; ?>
+</p>

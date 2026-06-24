@@ -103,6 +103,54 @@ function getMVP($equipe_id)
 }
 
 
+function getEquipePrefereeLeague($idLeague)
+{
+    $sql = "SELECT e.nom, COUNT(*) as nb
+            FROM UTILISATEUR u
+            JOIN EQUIPE e ON u.equipe_pref_id = e.id
+            JOIN MEMBRE_LEAGUE ml ON u.id = ml.user_id
+            WHERE ml.league_id = $idLeague
+            AND u.equipe_pref_id IS NOT NULL
+            GROUP BY e.id
+            ORDER BY nb DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
+function getMVPLigue($idLeague)
+{
+    $sql = "SELECT j.nom, j.prenom, COUNT(*) as nb
+            FROM AVIS_MATCH a
+            JOIN JOUEUR j ON a.mvp_id = j.id
+            JOIN MEMBRE_LEAGUE ml ON a.user_id = ml.user_id
+            WHERE ml.league_id = $idLeague
+            GROUP BY j.id
+            ORDER BY nb DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
+function getTopViewerLeague($idLeague)
+{
+    $sql = "SELECT u.pseudo, COUNT(*) as nb
+            FROM AVIS_MATCH a
+            JOIN UTILISATEUR u ON a.user_id = u.id
+            JOIN MEMBRE_LEAGUE ml ON a.user_id = ml.user_id
+            WHERE ml.league_id = $idLeague
+            AND a.vu = 1
+            GROUP BY u.id
+            ORDER BY nb DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
+
 //eleonore-fin
 
 function getMatchs(int $userId, string $filtreEquipe = '', string $filtrePoule = ''): array {
@@ -542,8 +590,6 @@ function listerMatchsTroisJours() {
 
     return parcoursRS(SQLSelect($sql));
 }
-
-
 
 function inscrireUtilisateur($pseudo, $password, $equipeId, $joueurPrefere) {
     global $pdo;
