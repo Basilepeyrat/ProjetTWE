@@ -11,13 +11,14 @@ function listerMatchs()
                 e1.nom AS equipe_dom,
                 e2.nom AS equipe_ext,
                 m.score_dom,
-                m.score_ext
+                m.score_ext,
+                j.nom AS mvp_nom
             FROM MATCHS m
             JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
-            JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id";
+            JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id
+            LEFT JOIN JOUEUR j ON m.mvpfifa_id = j.id";
 
-    return parcoursRs(SQLSelect($sql));
-
+    return parcoursRS(SQLSelect($sql));
 }
 
 
@@ -36,6 +37,71 @@ function getMatchById($id)
 
     return parcoursRS(SQLSelect($sql, true)); 
 }
+
+
+function listerJoueursMatch($idMatch)
+{
+    $sql = "SELECT j.id, j.nom, j.prenom
+            FROM JOUEUR j
+            JOIN MATCHS m 
+                ON j.equipe_id = m.equipe_dom_id 
+                OR j.equipe_id = m.equipe_ext_id
+            WHERE m.id = $idMatch";
+
+    return parcoursRS(SQLSelect($sql));
+}
+
+function getStatsMatchs($equipe_id)
+{
+    $sql = "SELECT 
+        COUNT(*) AS joues,
+        SUM(CASE 
+            WHEN (equipe_dom_id = $equipe_id AND score_dom > score_ext)
+              OR (equipe_ext_id = $equipe_id AND score_ext > score_dom)
+            THEN 1 ELSE 0 END) AS gagnes,
+
+        SUM(CASE 
+            WHEN score_dom = score_ext
+            THEN 1 ELSE 0 END) AS nuls,
+
+        SUM(CASE 
+            WHEN (equipe_dom_id = $equipe_id AND score_dom < score_ext)
+              OR (equipe_ext_id = $equipe_id AND score_ext < score_dom)
+            THEN 1 ELSE 0 END) AS perdus
+
+    FROM MATCHS
+    WHERE equipe_dom_id = $equipe_id OR equipe_ext_id = $equipe_id";
+
+    return parcoursRS(SQLSelect($sql))[0];
+}
+
+function getNoteMoyenne($equipe_id)
+{
+    $sql = "SELECT AVG(note_match) AS moyenne
+            FROM AVIS_MATCH a
+            JOIN MATCHS m ON a.match_id = m.id
+            WHERE m.equipe_dom_id = $equipe_id 
+               OR m.equipe_ext_id = $equipe_id";
+
+    return parcoursRS(SQLSelect($sql))[0];
+}
+
+function getMVP($equipe_id)
+{
+    $sql = "SELECT j.nom, j.prenom, COUNT(*) as nb
+            FROM AVIS_MATCH a
+            JOIN JOUEUR j ON a.mvp_id = j.id
+            JOIN MATCHS m ON a.match_id = m.id
+            WHERE m.equipe_dom_id = $equipe_id 
+               OR m.equipe_ext_id = $equipe_id
+            GROUP BY a.mvp_id
+            ORDER BY nb DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
 
 //eleonore-fin
 

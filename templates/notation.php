@@ -7,6 +7,7 @@ include_once("libs/modele.php");
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
     $match = getMatchById($id)[0];
+    $joueurs = listerJoueursMatch($id);
 } else {
     echo "Aucun match sélectionné";
     exit;
@@ -29,7 +30,7 @@ if (isset($_POST['note'])) {
     $vu = isset($_POST['vu']) ? 1 : 0;
     $stade = isset($_POST['stade']) ? 1 : 0;
 
-    $mvp_id = 1; // temporaire
+    $mvp_id = intval($_POST['mvp_id']);
 
     // Vérifier si l'avis existe déjà
     $sqlCheck = "SELECT * FROM AVIS_MATCH 
@@ -109,6 +110,19 @@ SQLInsert($sql);
     </label>
 
     <br><br>
+
+    <br><br>
+
+    <label>MVP du match :</label>
+    <select name="mvp_id">
+        <?php foreach ($joueurs as $j) { ?>
+            <option value="<?= $j['id'] ?>">
+                <?= $j['prenom'] . " " . $j['nom'] ?>
+            </option>
+        <?php } ?>
+    </select>
+
+
     <input type="submit" value="Valider">
 
 </form>

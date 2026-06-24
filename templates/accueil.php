@@ -24,6 +24,12 @@ foreach ($matchs as $match) {
     
     echo "</a>";
     
+    if (!empty($match['mvp_nom'])) {
+        echo "<br><em>MVP : " . $match['mvp_nom'] . "</em>";
+    } else {
+        echo "<br><em>MVP : à venir</em>";
+    }
+
     echo "</div><br>";
 }
 ?>
