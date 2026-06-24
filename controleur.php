@@ -147,7 +147,18 @@ session_start();
 					$qs = "?view=demandes&idLeague=$idLeague";
 				break;
 			
-			
+			case 'valider_inscription':
+					$pseudo = $_POST['pseudo'];
+					$passe = $_POST['passe'];
+					$equipe_id = $_POST['equipe_id'];
+					$joueur_prefere = $_POST['joueur_prefere'];
+					
+					if (!empty($pseudo) && !empty($passe)) {
+						inscrireUtilisateur($pseudo, $passe, $equipe_id, $joueur_prefere);
+						header("Location: index.php?view=connexion");
+						exit;
+    }
+break;
 				// Connexion //////////////////////////////////////////////////
 			case 'Connexion' :
 
