@@ -10,7 +10,7 @@ $isAjax  = isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
 if ($idMatch && $isAjax) {
-    $m = getMatchAdmin($idMatch);
+    $m = getMatchById($idMatch);
     if (!$m) { echo "<p class='text-muted'>Match introuvable</p>"; exit; }
     ?>
 
