@@ -179,6 +179,145 @@ function listerMatchsEquipe($idEquipe)
 }
 
 
+function getEquipePlusFans()
+{
+    $sql = "SELECT E.nom, COUNT(*) AS nb
+            FROM UTILISATEUR U
+            JOIN EQUIPE E ON U.equipe_pref_id = E.id
+            GROUP BY E.id
+            ORDER BY nb DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
+function getJoueurPlusFans()
+{
+    $sql = "SELECT J.prenom, J.nom, COUNT(*) AS nb
+            FROM UTILISATEUR U
+            JOIN JOUEUR J ON U.joueur_pref_id = J.id
+            GROUP BY J.id
+            ORDER BY nb DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
+function getEquipeMieuxNotee()
+{
+    $sql = "SELECT E.nom,
+                   AVG(A.note_match) AS moyenne
+            FROM EQUIPE E
+            JOIN MATCHS M
+                 ON E.id = M.equipe_dom_id
+                 OR E.id = M.equipe_ext_id
+            JOIN AVIS_MATCH A
+                 ON A.match_id = M.id
+            WHERE A.note_match IS NOT NULL
+            GROUP BY E.id
+            ORDER BY moyenne DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
+function getMatchPlusVu()
+{
+    $sql = "SELECT
+                M.id,
+                E1.nom AS equipe_dom,
+                E2.nom AS equipe_ext,
+                COUNT(*) AS nb
+            FROM AVIS_MATCH A
+            JOIN MATCHS M ON A.match_id = M.id
+            JOIN EQUIPE E1 ON M.equipe_dom_id = E1.id
+            JOIN EQUIPE E2 ON M.equipe_ext_id = E2.id
+            WHERE A.vu_ou IS NOT NULL
+            GROUP BY M.id
+            ORDER BY nb DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
+function getMVPGlobal()
+{
+    $sql = "SELECT
+                J.prenom,
+                J.nom,
+                COUNT(*) AS nb
+            FROM AVIS_MATCH A
+            JOIN JOUEUR J ON J.id = A.mvp_id
+            WHERE A.mvp_id IS NOT NULL
+            GROUP BY J.id
+            ORDER BY nb DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
+function getEquipePlusButs()
+{
+    $sql = "
+    SELECT nom, SUM(buts) AS total
+    FROM
+    (
+        SELECT E.nom, M.score_dom AS buts
+        FROM MATCHS M
+        JOIN EQUIPE E ON E.id = M.equipe_dom_id
+
+        UNION ALL
+
+        SELECT E.nom, M.score_ext AS buts
+        FROM MATCHS M
+        JOIN EQUIPE E ON E.id = M.equipe_ext_id
+    ) T
+    GROUP BY nom
+    ORDER BY total DESC
+    LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
+function getMeilleurButeur()
+{
+    $sql = "SELECT
+                J.prenom,
+                J.nom,
+                COUNT(*) AS nb_buts
+            FROM BUT B
+            JOIN JOUEUR J ON J.id = B.buteur_id
+            GROUP BY J.id
+            ORDER BY nb_buts DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
+function getMeilleurPasseur()
+{
+    $sql = "SELECT
+                J.prenom,
+                J.nom,
+                COUNT(*) AS nb_passes
+            FROM BUT B
+            JOIN JOUEUR J ON J.id = B.passeur_id
+            WHERE B.passeur_id IS NOT NULL
+            GROUP BY J.id
+            ORDER BY nb_passes DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : null;
+}
+
 //eleonore-fin
 
 function getMatchs(int $userId, string $filtreEquipe = '', string $filtrePoule = ''): array {

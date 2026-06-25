@@ -13,75 +13,89 @@ $equipes = listerEquipes();
 
 <div id="stats"></div>
 
-<?php
-if (isset($_GET['equipe_id'])) {
-    $equipe_id = intval($_GET['equipe_id']);
-}
-?>
-
-
-<?php
-if (isset($equipe_id)) {
-
-    $stats = getStatsMatchs($equipe_id);
-    $note = getNoteMoyenne($equipe_id);
-    $mvp = getMVP($equipe_id);
-?>
-
-<h2>Statistiques</h2>
-
-<p>Matchs joués : <?= $stats['joues'] ?></p>
-<p>Gagnés : <?= $stats['gagnes'] ?></p>
-<p>Nuls : <?= $stats['nuls'] ?></p>
-<p>Perdus : <?= $stats['perdus'] ?></p>
-
-<p>Note moyenne : <?= round($note['moyenne'], 2) ?></p>
-
-<p>
-MVP le plus choisi :
-<?php
-if ($mvp) {
-    echo $mvp['prenom'] . " " . $mvp['nom'];
-} else {
-    echo "Aucun";
-}
-?>
-</p>
-
-<?php } ?>
 
 
 <script src="js/jquery-4.0.0.min.js"></script>
 
 <script>
-$(document).ready(function() {
 
-$("#equipeSelect").change(function() {
+$(document).ready(function(){
 
-    let id = $(this).val();
+    chargerStats();
 
-    if (id == "") return;
+    $("#equipeSelect").change(function(){
 
-    $.ajax({
-        url: "ajax/getStatsEquipe.php",
-        data: { equipe_id: id },
-        dataType: "json",
-        success: function(data) {
+        chargerStats($(this).val());
 
-            let html = `
-                <h2>Statistiques</h2>
-                <p>Matchs joués : ${data.joues}</p>
-                <p>Gagnés : ${data.gagnes}</p>
-                <p>Nuls : ${data.nuls}</p>
-                <p>Perdus : ${data.perdus}</p>
-                <p>Note moyenne : ${data.moyenne}</p>
-                <p>MVP : ${data.mvp}</p>
-            `;
-
-            $("#stats").html(html);
-        }
     });
 
 });
-});
+
+
+function chargerStats(idEquipe = ""){
+
+    $.ajax({
+
+        url: "ajax/getStats.php",
+
+        data: { equipe_id: idEquipe },
+
+        dataType: "json",
+
+        success:function(data){
+
+            let html="";
+
+            if(data.type=="general"){
+
+                html = `
+                <h2>Statistiques générales</h2>
+
+                <p><b>Équipe avec le plus de fans :</b> ${data.equipeFans} (${data.nbFans} fans)</p>
+
+                <p><b>Joueur avec le plus de fans :</b> ${data.joueurFans} (${data.nbFansJoueur} fans)</p>
+
+                <p><b>Équipe la mieux notée :</b> ${data.equipeNote} (${data.note}/10)</p>
+
+                <p><b>Match le plus vu :</b> ${data.match} (${data.vues} vues)</p>
+
+                <p><b>MVP le plus élu :</b> ${data.mvp} (${data.nbMvp} fois)</p>
+
+                <p><b>Équipe ayant marqué le plus de buts :</b> ${data.equipeButs} (${data.buts} buts)</p>
+
+                <p><b>Meilleur buteur :</b> ${data.buteur} (${data.nbButs} buts)</p>
+
+                <p><b>Meilleur passeur :</b> ${data.passeur} (${data.nbPasses} passes)</p>
+                `;
+
+            }
+
+            else{
+
+                html = `
+                <h2>Statistiques</h2>
+
+                <p>Matchs joués : ${data.joues}</p>
+
+                <p>Gagnés : ${data.gagnes}</p>
+
+                <p>Nuls : ${data.nuls}</p>
+
+                <p>Perdus : ${data.perdus}</p>
+
+                <p>Note moyenne : ${data.moyenne}</p>
+
+                <p>MVP le plus choisi : ${data.mvp}</p>
+                `;
+
+            }
+
+            $("#stats").html(html);
+
+        }
+
+    });
+
+}
+
 </script>
