@@ -1,14 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3deb1
+-- version 4.9.5deb2
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : mer. 24 juin 2026 à 14:43
+-- Généré le : jeu. 25 juin 2026 à 14:29
 -- Version du serveur :  8.0.42-0ubuntu0.20.04.1
 -- Version de PHP : 7.4.3-4ubuntu2.29
 
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -31,10 +31,23 @@ SET time_zone = "+00:00";
 CREATE TABLE `AVIS_MATCH` (
   `user_id` int NOT NULL,
   `match_id` int NOT NULL,
-  `vu` tinyint(1) DEFAULT '0',
   `note_match` int DEFAULT NULL,
   `mvp_id` int DEFAULT NULL,
-  `present_stade` tinyint(1) DEFAULT '0'
+  `vu_ou` enum('stade','maison','bar') DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `BUT`
+--
+
+CREATE TABLE `BUT` (
+  `id` int NOT NULL,
+  `match_id` int NOT NULL,
+  `buteur_id` int NOT NULL,
+  `passeur_id` int DEFAULT NULL,
+  `minute` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -1613,6 +1626,15 @@ ALTER TABLE `AVIS_MATCH`
   ADD KEY `mvp_id` (`mvp_id`);
 
 --
+-- Index pour la table `BUT`
+--
+ALTER TABLE `BUT`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `but_match_fk` (`match_id`),
+  ADD KEY `but_buteur_fk` (`buteur_id`),
+  ADD KEY `but_passeur_fk` (`passeur_id`);
+
+--
 -- Index pour la table `COMMENTAIRE`
 --
 ALTER TABLE `COMMENTAIRE`
@@ -1691,6 +1713,12 @@ ALTER TABLE `UTILISATEUR`
 --
 
 --
+-- AUTO_INCREMENT pour la table `BUT`
+--
+ALTER TABLE `BUT`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT pour la table `COMMENTAIRE`
 --
 ALTER TABLE `COMMENTAIRE`
@@ -1749,6 +1777,14 @@ ALTER TABLE `AVIS_MATCH`
   ADD CONSTRAINT `avis_match_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `UTILISATEUR` (`id`),
   ADD CONSTRAINT `avis_match_ibfk_2` FOREIGN KEY (`match_id`) REFERENCES `MATCHS` (`id`),
   ADD CONSTRAINT `avis_match_ibfk_3` FOREIGN KEY (`mvp_id`) REFERENCES `JOUEUR` (`id`);
+
+--
+-- Contraintes pour la table `BUT`
+--
+ALTER TABLE `BUT`
+  ADD CONSTRAINT `but_buteur_fk` FOREIGN KEY (`buteur_id`) REFERENCES `JOUEUR` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `but_match_fk` FOREIGN KEY (`match_id`) REFERENCES `MATCHS` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `but_passeur_fk` FOREIGN KEY (`passeur_id`) REFERENCES `JOUEUR` (`id`) ON DELETE SET NULL;
 
 --
 -- Contraintes pour la table `COMMENTAIRE`
