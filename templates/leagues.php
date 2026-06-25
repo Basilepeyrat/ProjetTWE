@@ -18,9 +18,9 @@ $leagues = listerLeaguesUtilisateur($idUser);
 <div id="leagues">
 
 	<!-- Créer une nouvelle league -->
-	<form class="league-new" method="get" action="controleur.php">
+	<form class="search" method="get" action="controleur.php">
 		<input type="text" name="nom" placeholder="nouvelle league" required="required" />
-		<button type="submit" name="action" value="Creer league" class="btn">+</button>
+		<button type="submit" name="action" value="Creer league" class="bt-plus">+</button>
 	</form>
 	
 	<!-- rechercher une nouvelle league -->

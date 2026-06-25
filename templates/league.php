@@ -28,7 +28,7 @@ marquerLeagueLue($idUser, $idLeague);
 		<a class="reglages" href="index.php?view=demandes&amp;idLeague=<?php echo $league['id']; ?>" aria-label="Gérer les demandes">⚙</a>
 	<?php endif; ?>
 	<a class="retour" href="index.php?view=leagues" aria-label="Retour">←</a>
-	<h1 class="lg-titre"><?php echo htmlspecialchars($league['nom']); ?></h1>
+	<h1 class="lg-titre"><?php echo htmlspecialchars($league['nom']); ?> - Id:<?php echo $league['id']; ?></h1>
 </div>
 
 <a class="chat-acces" href="index.php?view=chat&amp;idLeague=<?php echo $league['id']; ?>">
