@@ -3,19 +3,23 @@ include_once("libs/modele.php");
 include_once("libs/maLibUtils.php");
 include_once("libs/maLibSecurisation.php");
 
-securiser("login");
+securiser("login");                          // 1) connecté ?
 
-$idUser = valider("idUser", "SESSION");
+$idUser = valider("idUser", "SESSION");      // 2) variables
 $id     = valider("id");
 
-$matchData = getMatchById($id);
+$matchData = getMatchById($id);   
+
+      // 3) le match existe ?
 if (!$matchData) {
 	echo '<p class="vide">Match introuvable.</p>';
 	return;
 }
 $match   = $matchData[0];
 $idMatch = (int) $id;
-$joueurs = listerJoueursMatch($id);
+$joueurs = listerJoueursMatch($idMatch);
+
+
 $nomMatch = $match['equipe_dom'] . " vs " . $match['equipe_ext'];
 
 
@@ -25,18 +29,20 @@ ini_set('display_errors', 1);
 
 if (isset($_POST['note'])) {
 
-    $match_id = intval($_GET['id']);
-    $user_id = valider("idUser", "SESSION");
+    $match_id = $idMatch;
+    $user_id  = $idUser;
 
     $note = intval($_POST['note']);
-    $vu = isset($_POST['vu']) ? 1 : 0;
-    $stade = isset($_POST['stade']) ? 1 : 0;
+    $vu_ou   = !empty($_POST['vu_ou']) ? $_POST['vu_ou'] : null;
+    $vuOuVal = $vu_ou ? "'$vu_ou'" : "NULL";
 
-    $mvp_id = intval($_POST['mvp_id']);
-
+    $mvp_id = !empty($_POST['mvp_id']) ? intval($_POST['mvp_id']) : null;
+    $mvpVal = $mvp_id ? $mvp_id : "NULL";
+    
     // Vérifier si l'avis existe déjà
     $sqlCheck = "SELECT * FROM AVIS_MATCH 
              WHERE user_id = $user_id AND match_id = $match_id";
+    
 
     $res = parcoursRS(SQLSelect($sqlCheck));
 
@@ -44,21 +50,19 @@ if (isset($_POST['note'])) {
 
     //on maj les données
     $sql = "UPDATE AVIS_MATCH SET 
-            vu = $vu,
             note_match = $note,
-            mvp_id = $mvp_id,
-            present_stade = $stade
+            mvp_id = $mvpVal,
+            vu_ou = $vuOuVal
             WHERE user_id = $user_id AND match_id = $match_id";
 
     } else {
 
     //insertion
     $sql = "INSERT INTO AVIS_MATCH 
-            (user_id, match_id, vu, note_match, mvp_id, present_stade)
-            VALUES 
-            ($user_id, $match_id, $vu, $note, $mvp_id, $stade)";
+        (user_id, match_id, note_match, mvp_id, vu_ou)
+        VALUES 
+        ($user_id, $match_id, $note, $mvpVal, $vuOuVal)";
 }
-
 SQLInsert($sql);
 
     if (!empty($_POST['commentaire'])) {
@@ -100,16 +104,13 @@ SQLInsert($sql);
     <br><br>
 
     <!-- Vu -->
-    <label>
-        <input type="checkbox" name="vu"> J'ai vu le match
-    </label>
-
-    <br>
-
-    <!-- Stade -->
-    <label>
-        <input type="checkbox" name="stade"> J'étais au stade
-    </label>
+    <label>Où avez-vous vu le match ?</label>
+    <select name="vu_ou">
+        <option value="">Pas vu</option>
+        <option value="maison">À la maison</option>
+        <option value="bar">Au bar</option>
+        <option value="stade">Au stade</option>
+    </select>
 
     <br><br>
 
