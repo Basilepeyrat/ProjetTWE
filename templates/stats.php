@@ -63,7 +63,7 @@ $("#equipeSelect").change(function() {
     if (id == "") return;
 
     $.ajax({
-        url: "api/getStatsEquipe.php",
+        url: "ajax/getStatsEquipe.php",
         data: { equipe_id: id },
         dataType: "json",
         success: function(data) {

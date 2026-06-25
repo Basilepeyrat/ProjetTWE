@@ -3,19 +3,19 @@ include_once("libs/modele.php");
 include_once("libs/maLibUtils.php");
 include_once("libs/maLibSecurisation.php");
 
-securiser("login");                          // 1) connecté ?
+securiser("login");
 
-$idUser = valider("idUser", "SESSION");      // 2) variables
+$idUser = valider("idUser", "SESSION");
 $id     = valider("id");
 
-$matchData = getMatchById($id);              // 3) le match existe ?
+$matchData = getMatchById($id);
 if (!$matchData) {
 	echo '<p class="vide">Match introuvable.</p>';
 	return;
 }
 $match   = $matchData[0];
 $idMatch = (int) $id;
-
+$joueurs = listerJoueursMatch($id);
 $nomMatch = $match['equipe_dom'] . " vs " . $match['equipe_ext'];
 
 
