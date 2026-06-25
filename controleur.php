@@ -20,7 +20,7 @@ session_start();
 
 		// Dans tous les cas, il faut etre logue...
 		// Sauf si on veut se connecter (action == Connexion)
-		if ($action != "Connexion")
+		if ($action != "Connexion" && $action != "valider_inscription")
 			securiser("login");
 
 		// Les actions de gestion des utilisateurs sont réservées aux administrateurs
