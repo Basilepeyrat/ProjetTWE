@@ -6,7 +6,10 @@
 <?php
 include_once("libs/modele.php");
 $equipes = listerEquipes();
+$poules  = listerPoules();
 ?>
+
+<div class="controles-accueil">
 
 <h2>Recherche par équipe</h2>
 
@@ -36,10 +39,32 @@ $equipes = listerEquipes();
     </a>
 <?php } ?>
 
+<?php
+// Filtre tous / mes matchs vus — affiché seulement hors recherche par équipe
+if (!isset($_GET['equipe_id']) || $_GET['equipe_id'] == "") { ?>
+    <h2>Filtre</h2>
+    <form method="get" action="index.php" style="display:inline">
+        <input type="hidden" name="view" value="accueil" />
+        <select name="filtre" onchange="this.form.submit()">
+            <option value="">Tous les matchs</option>
+            <option value="vus" <?= (isset($_GET['filtre']) && $_GET['filtre'] == "vus") ? "selected" : "" ?>>Mes matchs vus</option>
+        </select>
+        <select name="poule" onchange="this.form.submit()">
+            <option value="">Toutes les poules</option>
+            <?php foreach ($poules as $p): ?>
+                <option value="<?= $p['poule'] ?>" <?= (isset($_GET['poule']) && $_GET['poule'] == $p['poule']) ? "selected" : "" ?>>
+                    Poule <?= $p['poule'] ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </form>
+<?php } ?>
+
+</div><!-- /controles-accueil -->
+
 <h2>Matchs</h2>
 
 <?php
-
 
 function afficherCarteMatch($match) {
     echo "<div class='match-card'>";
@@ -52,104 +77,64 @@ function afficherCarteMatch($match) {
     echo "</div>";
 }
 
-// on récupère d'abord les matchs sur les trois jours qui nous interessent ou alors les matchs de l'equipe selectionnee
+// Soit les matchs d'une équipe sélectionnée, soit tous les matchs (ou seulement ceux vus)
 if (isset($_GET['equipe_id']) && $_GET['equipe_id'] != "")
 {
     $tousLesMatchs = listerMatchsEquipe((int)$_GET['equipe_id']); ?>
 
-<h2>Tous les matchs de l'équipe</h2>
+    <h2>Tous les matchs de l'équipe</h2>
 
-<div class="liste">
-<?php
-foreach($tousLesMatchs as $match)
-{
-    afficherCarteMatch($match);
-}
-?>
-</div>    
-
-<?php }else
-{
-    $tousLesMatchs = listerMatchsTroisJours();
-
-
-
-$matchsHier = [];
-$matchsAujourdhui = [];
-$matchsDemain = [];
-
-// pour trier les match suivant leur jour
-$hier = date('Y-m-d', strtotime('-1 day'));
-$aujourdhui = date('Y-m-d');
-$demain = date('Y-m-d', strtotime('+1 day'));
-
-
-foreach ($tousLesMatchs as $match) {
-    $dateDuMatch = date('Y-m-d', strtotime($match['date_match']));
-    
-    if ($dateDuMatch === $hier) {
-        $matchsHier[] = $match;
-    } elseif ($dateDuMatch === $aujourdhui) {
-        $matchsAujourdhui[] = $match;
-    } elseif ($dateDuMatch === $demain) {
-        $matchsDemain[] = $match;
+    <div class="liste">
+    <?php
+    foreach($tousLesMatchs as $match)
+    {
+        afficherCarteMatch($match);
     }
-}
-
-?>
-
-<div class="dashboard-matchs">
-
-    <div class="colonne-matchs">
-        <h2>Hier</h2>
-        <div class="liste">
-            <?php 
-            if (empty($matchsHier)) {
-                echo "<p class='no-match'>Aucun match</p>";
-            } else {
-                foreach ($matchsHier as $match) { 
-                    afficherCarteMatch($match); 
-                } 
-            }
-            ?>
-        </div>
+    ?>
     </div>
 
-    <div class="colonne-matchs colonne-active">
-        <h2>Aujourd'hui</h2>
-        <div class="liste">
-            <?php 
-            if (empty($matchsAujourdhui)) {
-                echo "<p class='no-match'>Aucun match prévu</p>";
-            } else {
-                foreach ($matchsAujourdhui as $match) { 
-                    afficherCarteMatch($match); 
-                } 
-            }
-            ?>
-        </div>
+<?php }
+else
+{
+    // Filtres combinables : poule et/ou "mes matchs vus" (sinon tous les matchs)
+    $idUser = valider("idUser", "SESSION");
+    $vus    = (valider("filtre") == "vus");
+    $poule  = valider("poule");
+
+    $tousLesMatchs = listerMatchsFiltres($poule, $vus, $idUser);
+
+    // pour insérer un titre de date à chaque changement de jour
+    $aujourdhui   = date('Y-m-d');
+    $dateCourante = null;
+    ?>
+
+    <div class="liste">
+    <?php foreach ($tousLesMatchs as $match):
+        $jour = date('Y-m-d', strtotime($match['date_match']));
+        if ($jour !== $dateCourante):
+            $dateCourante  = $jour;
+            $estAujourdhui = ($jour === $aujourdhui);
+    ?>
+        <h2 <?= $estAujourdhui ? 'id="aujourdhui"' : '' ?>>
+            <?= $estAujourdhui ? "Aujourd'hui" : date('d/m/Y', strtotime($jour)) ?>
+        </h2>
+    <?php endif; ?>
+
+        <?php afficherCarteMatch($match); ?>
+
+    <?php endforeach; ?>
+
+    <?php if (count($tousLesMatchs) == 0): ?>
+        <p class="no-match">Aucun match.</p>
+    <?php endif; ?>
     </div>
-
-    <div class="colonne-matchs">
-        <h2>Demain</h2>
-        <div class="liste">
-            <?php 
-            if (empty($matchsDemain)) {
-                echo "<p class='no-match'>Aucun match prévu</p>";
-            } else {
-                foreach ($matchsDemain as $match) { 
-                    afficherCarteMatch($match); 
-                } 
-            }
-            ?>
-        </div>
-    </div>
-
-</div>
-
-</div>
 
 <?php } ?>
 
+</div>
 
- 
+<script>
+// au chargement, on se positionne directement sur les matchs d'aujourd'hui (s'il y en a)
+var auj = document.getElementById('aujourdhui');
+if (auj) auj.scrollIntoView();
+</script>

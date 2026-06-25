@@ -22,7 +22,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="icon" type="image/svg+xml" href="ressources/favicon.svg">
-	<link rel="stylesheet" type="text/css" href="css/style.css?v=5">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=6">
 	<script src="js/jquery-4.0.0.min.js"></script>
 	<script src="js/messagerie.js"></script>
 	<script src="js/utils.js"></script>

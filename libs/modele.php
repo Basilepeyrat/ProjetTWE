@@ -694,7 +694,59 @@ function ajouterPasse($idJoueur)
     SQLUpdate("UPDATE JOUEUR SET passe_dec = passe_dec + 1 WHERE id='$idJoueur'");
 }
 
+function listerMatchsVus($idUser)
+{
+    $sql = "SELECT m.id, e1.nom AS equipe_dom, e2.nom AS equipe_ext,
+                   m.score_dom, m.score_ext, m.date_match
+            FROM MATCHS m
+            JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
+            JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id
+            JOIN AVIS_MATCH a ON a.match_id = m.id
+            WHERE a.user_id = '$idUser' AND a.vu = 1
+            ORDER BY m.date_match ASC";
+    return parcoursRS(SQLSelect($sql));
+}
 
+function listerTousLesMatchs()
+{
+    $sql = "SELECT m.id, e1.nom AS equipe_dom, e2.nom AS equipe_ext,
+                   m.score_dom, m.score_ext, m.date_match
+            FROM MATCHS m
+            JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
+            JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id
+            ORDER BY m.date_match ASC";
+    return parcoursRS(SQLSelect($sql));
+}
 
+// Liste les poules existantes (A, B, C, ...) — auteur : Basile
+function listerPoules()
+{
+    return parcoursRS(SQLSelect("SELECT DISTINCT poule FROM EQUIPE
+                                 WHERE poule IS NOT NULL ORDER BY poule"));
+}
 
+// Liste les matchs avec filtres optionnels : poule, "vus" (par l'utilisateur), ou tout — auteur : Basile
+function listerMatchsFiltres($poule = '', $vus = false, $idUser = null)
+{
+    $sql = "SELECT m.id, e1.nom AS equipe_dom, e2.nom AS equipe_ext,
+                   m.score_dom, m.score_ext, m.date_match
+            FROM MATCHS m
+            JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
+            JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id";
+
+    // filtre "matchs vus par l'utilisateur"
+    if ($vus) {
+        $sql .= " JOIN AVIS_MATCH a ON a.match_id = m.id AND a.user_id = '$idUser' AND a.vu = 1";
+    }
+
+    $sql .= " WHERE 1=1";
+
+    // filtre par poule (équipe dom OU ext dans la poule)
+    if ($poule != '') {
+        $sql .= " AND (e1.poule = '$poule' OR e2.poule = '$poule')";
+    }
+
+    $sql .= " ORDER BY m.date_match ASC";
+    return parcoursRS(SQLSelect($sql));
+}
 ?>
