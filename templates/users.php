@@ -1,108 +1,192 @@
 <?php
-// Ce fichier permet de tester les fonctions développées dans le fichier bdd.php (première partie)
-
-// Si la page est appelée directement par son adresse, on redirige en passant pas la page index
-if (basename($_SERVER["PHP_SELF"]) == "users.php")
-{
-	header("Location:../index.php?view=users");
-	die("");
+if (basename($_SERVER["PHP_SELF"]) != "index.php") {
+    header("Location:../index.php?view=users");
+    die("");
 }
 
-include_once("libs/modele.php");
-include_once("libs/maLibUtils.php"); // tprint
-include_once("libs/maLibSecurisation.php");
-
-// Page d'administration : réservée aux administrateurs
 securiserAdmin("login");
 
+$users = listerUtilisateursAdmin();
 ?>
 
-<h1>Administration du site</h1>
+<div class="top-bar">
+    <h1>👥 Utilisateurs</h1>
+    <p>Réservé aux administrateurs</p>
+</div>
 
-<h2>Liste des utilisateurs de la base </h2>
+<div class="container">
 
-<?php
+    <div id="toast"></div>
 
-echo "liste des utilisateurs autorises de la base :"; 
-$users = listerUtilisateurs("nbl");
-tprint($users);	// préférer un appel à mkTable($users);
+    <div class="form-group">
+        <input type="text" placeholder="Rechercher un utilisateur…"
+               oninput="filtrerUsers(this.value)" />
+    </div>
 
-// TODO : finaliser listerUtilisateurs() en prenant en compte son paramètre
-// Afficher juste les pseudo des utilisateurs 
-// avec une boucle for 
+    <?php foreach ($users as $u):
+        $isAdmin = $u['admin'] == 1;
+        $isBl    = $u['blacklist'] == 1;
+    ?>
+    <div class="card"
+         data-pseudo="<?= htmlspecialchars(strtolower($u['pseudo'])) ?>"
+         data-id="<?= $u['id'] ?>"
+         data-admin="<?= $isAdmin ? '1' : '0' ?>"
+         data-bl="<?= $isBl ? '1' : '0' ?>"
+         onclick="toggleCard(this)">
 
-for($i=0;$i<count($users);$i++) {
-	// $users[$i] est un tableau associatif
-	echo $users[$i]["pseudo"] . " ";
+        <h3><?= htmlspecialchars($u['pseudo']) ?></h3>
+        <div class="user-badges">
+            <?php if ($isAdmin): ?>
+                <span class="badge badge--rating">⭐ Admin</span>
+            <?php endif; ?>
+            <?php if ($isBl): ?>
+                <span class="badge badge--danger">🚫 Blacklisté</span>
+            <?php endif; ?>
+        </div>
+
+        <div class="body hidden mt-md" onclick="event.stopPropagation()">
+            <div>
+                <span class="badge badge--rating"><?= $u['nb_matchs_vus'] ?> matchs vus</span>
+                <span class="badge badge--rating"><?= $u['nb_leagues'] ?> leagues</span>
+            </div>
+            <div class="action-btns mt-md"></div>
+        </div>
+
+    </div>
+    <?php endforeach; ?>
+
+</div>
+
+<script>
+function showToast(msg, ok) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = ok ? 'toast toast--success' : 'toast toast--danger';
+    t.style.display = 'block';
+    setTimeout(function() { t.style.display = 'none'; }, 2500);
 }
 
-// avec une boucle foreach 
-//foreach($tab as $case)
-//foreach($tabAsso as $valeur)
-//foreach($tabAsso as $cle=>$valeur)
-foreach($users as $dataUser)
-	echo $dataUser["pseudo"] . " ";
-
-
-echo "<hr />";
-echo "liste des utilisateurs non autorises de la base :"; 
-$users = listerUtilisateurs("bl");
-tprint($users);	// préférer un appel à mkTable($users);
-
-?>
-<hr />
-<h2>Changement de statut des utilisateurs</h2>
-
-<form action="controleur.php">
-
-<select name="idUser">
-<?php
-$users = listerUtilisateurs();
-
-// préférer un appel à mkSelect("idUser",$users, ...)
-foreach ($users as $dataUser)
-{
-	// préselectionner une option : 
-	// attribut selected 
-	$sel = ""; 
-	// if (dernier utilisateur manipulé == utilisateur qui doit être affiché)
-	if ($dataUser["id"] == valider("idLastUser"))
-	$sel = "selected"; 
-	
-	echo "<option $sel value=\"$dataUser[id]\">\n";
-	echo  $dataUser["pseudo"];
-	echo  ($dataUser["blacklist"]) ? " (bl)": " (nbl)";
-	
-	echo "\n</option>\n"; 
+function fermerTous() {
+    document.querySelectorAll('.body').forEach(function(p) { p.classList.add('hidden'); });
 }
-?>
-</select>
 
-<button type="submit" name="action" value="interdire">Blacklister</button>
+function toggleCard(card) {
+    var body   = card.querySelector('.body');
+    var isOpen = !body.classList.contains('hidden');
+    fermerTous();
+    if (!isOpen) {
+        body.classList.remove('hidden');
+        renderButtons(card);
+    }
+}
 
-<input type="submit" name="action" value="Interdire" />
-<input type="submit" name="action" value="Autoriser" />
+function renderButtons(card) {
+    var isAdmin = card.dataset.admin === '1';
+    var isBl    = card.dataset.bl    === '1';
+    var idUser  = card.dataset.id;
+    var pseudo  = card.querySelector('h3').textContent.trim();
+    var wrap    = card.querySelector('.action-btns');
 
-<input type="submit" name="action" value="Promouvoir" />
-<input type="submit" name="action" value="Retrograder" />
-<input type="submit" name="action" value="Supprimer" />
-</form>
+    wrap.innerHTML = '';
 
-<!-- 
-TODO : ajouter une fonctionnalité au choix : 
-- nouvel utilisateur 
-- changer la couleur d'un utilisateur 
-- promouvoir ou rétrograder un utilisateur  
-- supprimer un utilisateur 
---> 
+    // Blacklist / Autoriser
+    var btnBl = document.createElement('button');
+    if (isBl) {
+        btnBl.className   = 'btn btn--success';
+        btnBl.textContent = '✓ Autoriser';
+        btnBl.onclick     = function() {
+            if (confirm('Autoriser ' + pseudo + ' ?'))
+                doAction('Autoriser', idUser, card);
+        };
+    } else {
+        btnBl.className   = 'btn btn--danger';
+        btnBl.textContent = '🚫 Blacklister';
+        if (isAdmin) {
+            btnBl.disabled = true;
+            btnBl.title    = 'Impossible de blacklister un admin';
+        } else {
+            btnBl.onclick = function() {
+                if (confirm('Blacklister ' + pseudo + ' ?'))
+                    doAction('Interdire', idUser, card);
+            };
+        }
+    }
+    wrap.appendChild(btnBl);
 
-<form action="controleur.php">
-Pseudo:<input type="text" name="pseudo" />
-Passe:<input type="password" name="passe" />
-<input type="submit" name="action" value="Créer utilisateur" />
-</form>
+    // Promouvoir / Rétrograder
+    var btnAdmin = document.createElement('button');
+    if (isAdmin) {
+        btnAdmin.className   = 'btn btn--outline';
+        btnAdmin.textContent = '↓ Rétrograder';
+        btnAdmin.onclick     = function() {
+            if (confirm('Rétrograder ' + pseudo + ' ?'))
+                doAction('Retrograder', idUser, card);
+        };
+    } else {
+        btnAdmin.className   = 'btn btn--primary';
+        btnAdmin.textContent = '⭐ Promouvoir';
+        if (isBl) {
+            btnAdmin.disabled = true;
+            btnAdmin.title    = 'Impossible de promouvoir un utilisateur blacklisté';
+        } else {
+            btnAdmin.onclick = function() {
+                if (confirm('Promouvoir ' + pseudo + ' en admin ?'))
+                    doAction('Promouvoir', idUser, card);
+            };
+        }
+    }
+    wrap.appendChild(btnAdmin);
 
+    // Supprimer — interdit pour les admins
+    if (!isAdmin) {
+        var btnDel = document.createElement('button');
+        btnDel.className   = 'btn btn--danger mt-sm';
+        btnDel.textContent = '🗑 Supprimer';
+        btnDel.onclick     = function() {
+            if (confirm('Supprimer définitivement ' + pseudo + ' ?'))
+                doAction('Supprimer', idUser, card);
+        };
+        wrap.appendChild(btnDel);
+    }
+}
 
+function doAction(action, idUser, card) {
+    var data = new FormData();
+    data.append('action', action);
+    data.append('idUser', idUser);
 
+    fetch('controleur.php', {
+        method: 'POST',
+        body: data,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+        showToast(res.msg, res.ok);
+        if (!res.ok) return;
 
+        if (action === 'Supprimer') { card.remove(); return; }
 
+        if (action === 'Interdire')   card.dataset.bl    = '1';
+        if (action === 'Autoriser')   card.dataset.bl    = '0';
+        if (action === 'Promouvoir')  card.dataset.admin = '1';
+        if (action === 'Retrograder') card.dataset.admin = '0';
+
+        // Met à jour les badges
+        var badgesEl = card.querySelector('.user-badges');
+        badgesEl.innerHTML = '';
+        if (card.dataset.admin === '1') badgesEl.innerHTML += '<span class="badge badge--rating">⭐ Admin</span>';
+        if (card.dataset.bl    === '1') badgesEl.innerHTML += '<span class="badge badge--danger">🚫 Blacklisté</span>';
+
+        renderButtons(card);
+		fermerTous();
+    });
+}
+
+function filtrerUsers(val) {
+    val = val.toLowerCase();
+    document.querySelectorAll('[data-pseudo]').forEach(function(card) {
+        card.style.display = card.dataset.pseudo.includes(val) ? '' : 'none';
+    });
+}
+</script>
