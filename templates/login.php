@@ -28,6 +28,8 @@ Login : <input type="text" name="login" /><br />
 Passe : <input type="password" name="passe" /><br />
 <input type="submit" name="action" value="Connexion" />
 </form>
+<a href="index.php?view=inscription">Pas de compte ? Créer un compte</a>
+
 </div>
 
 

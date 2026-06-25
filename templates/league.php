@@ -1,5 +1,5 @@
+
 <?php
-// Page d'une league (dashboard + chat) — auteur : Basile
 if (basename($_SERVER["PHP_SELF"]) == "league.php") {
 	header("Location:../index.php?view=leagues");
 	die("");
@@ -9,31 +9,34 @@ include_once("libs/modele.php");
 include_once("libs/maLibUtils.php");
 include_once("libs/maLibSecurisation.php");
 
+
+//Basile: sécurité de la page, seul un utilisateur peut acceder à cette page privée
 securiser("login"); // page privée
-securiserMembre($idUser, $idLeague);
 $idUser   = valider("idUser", "SESSION");
 $idLeague = valider("idLeague");
 $league   = getLeague($idLeague);
+securiserMembre($idUser, $idLeague);
 
 if (!$league) {
 	echo '<p class="vide">League introuvable.</p>';
-	return; // stoppe le template ici, on revient à index.php
+	return; // on revient à index.php si la league n'existe pas
 }
 
 marquerLeagueLue($idUser, $idLeague);
 
 ?>
+<!-- Basile: On ajoute un header sur la page avec une gestion des utilisateurs de la league.
+     Pour l'instant on ne peut qu'accepter ou refuser la demande d'un utilisateur.
+	On rajoute un bouton pour revenir en arrière pour acceder aux différentes leagues
+-->
 <div class="page-entete">
 	<?php if ($league['createur_id'] == $idUser) : ?>
 		<a class="reglages" href="index.php?view=demandes&amp;idLeague=<?php echo $league['id']; ?>" aria-label="Gérer les demandes">⚙</a>
-	<?php endif; ?>
+		<?php endif; ?>
 	<a class="retour" href="index.php?view=leagues" aria-label="Retour">←</a>
 	<h1 class="lg-titre"><?php echo htmlspecialchars($league['nom']); ?> - Id:<?php echo $league['id']; ?></h1>
 </div>
 
-<a class="chat-acces" href="index.php?view=chat&amp;idLeague=<?php echo $league['id']; ?>">
-	💬 Ouvrir le chat
-</a>
 
 <?php
 $equipePref = getEquipePrefereeLeague($idLeague);
@@ -57,3 +60,11 @@ MVP le plus choisi :
 Utilisateur ayant vu le plus de matchs :
 <?php echo $topViewer ? $topViewer['pseudo']." (".$topViewer['nb']." matchs)" : "Aucun"; ?>
 </p>
+
+
+
+
+<!-- Basile: on permet aussi l'acces au chat de league-->
+<a class="chat-acces" href="index.php?view=chat&amp;idLeague=<?php echo $league['id']; ?>">
+	💬 Ouvrir le chat
+</a>

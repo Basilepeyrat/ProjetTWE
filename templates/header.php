@@ -24,6 +24,8 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 	<link rel="icon" type="image/svg+xml" href="ressources/favicon.svg">
 	<link rel="stylesheet" type="text/css" href="css/style.css?v=5">
 	<script src="js/jquery-4.0.0.min.js"></script>
+	<script src="js/messagerie.js"></script>
+	<script src="js/utils.js"></script>
 </head>
 <!-- **** F I N **** H E A D **** -->
 

@@ -1,18 +1,20 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 include_once("libs/modele.php");
+include_once("libs/maLibUtils.php");
+include_once("libs/maLibSecurisation.php");
 
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $match = getMatchById($id)[0];
-    $joueurs = listerJoueursMatch($id);
-} else {
-    echo "Aucun match sélectionné";
-    exit;
+securiser("login");                          // 1) connecté ?
+
+$idUser = valider("idUser", "SESSION");      // 2) variables
+$id     = valider("id");
+
+$matchData = getMatchById($id);              // 3) le match existe ?
+if (!$matchData) {
+	echo '<p class="vide">Match introuvable.</p>';
+	return;
 }
-
+$match   = $matchData[0];
+$idMatch = (int) $id;
 
 $nomMatch = $match['equipe_dom'] . " vs " . $match['equipe_ext'];
 
@@ -130,13 +132,9 @@ SQLInsert($sql);
 
 
 <h2>Commentaires</h2>
-<?php
-$idMatch = (int) $id;
-$idUser  = valider("idUser", "SESSION");
-?>
 
 <div id="commentaires" class="chat-box">
-	<?php $commentaires = array_reverse(listerCommentaires($idMatch, 100, 0)); ?>
+	<?php $commentaires = listerCommentairesDepuis($idMatch, 0); ?>
 
 	<?php if (count($commentaires) == 0) : ?>
 		<p class="vide">Aucun commentaire pour ce match.</p>
@@ -159,3 +157,15 @@ $idUser  = valider("idUser", "SESSION");
 	<input type="text" name="contenu" placeholder="Écrire un commentaire…" autocomplete="off" required="required" />
 	<button type="submit" name="action" value="Envoyer commentaire" aria-label="Envoyer">➤</button>
 </form>
+
+
+<script>
+initMessagerie({
+	type: 'commentaire',
+	id: <?php echo (int) $idMatch; ?>,
+	monId: <?php echo (int) $idUser; ?>,
+	dernierId: <?php echo (int) (count($commentaires) ? end($commentaires)['id'] : 0); ?>,
+	boxId: 'commentaires',
+	formSelector: '.comment-form'
+});
+</script>

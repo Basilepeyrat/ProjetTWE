@@ -1,10 +1,17 @@
-<?php
+      <?php
+if (basename($_SERVER["PHP_SELF"]) == "inscription.php") {
+	header("Location:../index.php?view=inscription");
+	die("");
+}
 
 include_once("libs/modele.php");
+include_once("libs/maLibUtils.php");
 
-// on récupère les équipes
 $equipes = listerEquipes();
+$joueurs = listerJoueurs();
 ?>
+
+
 
 <div id="corps">
     <h1>Inscription</h1>
@@ -30,15 +37,30 @@ $equipes = listerEquipes();
                     <option value="<?php echo $equipe['id']; ?>">
                         <?php echo $equipe['nom']; ?>
                     </option>
-                <?php endphp; ?>
+                <?php endforeach; ?>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="joueur">Joueur préféré :</label>
-            <input type="text" id="joueur" name="joueur_prefere" placeholder="Ex: Mbappé, Messi...">
-        </div>
+    <label for="filtreJoueur">Joueur préféré :</label><br/>
+    <input type="text" id="filtreJoueur" placeholder="Tapez pour filtrer..."
+           oninput="filtrer('filtreJoueur','selectJoueur')"
+           style="margin-bottom:4px; padding:4px; width:300px;" />
+    <br/>
+        <select name="joueur_prefere" id="selectJoueur" size="6">
+            <option value="">-- Aucun --</option>
+            <?php foreach ($joueurs as $j): ?>
+                <option value="<?php echo $j['id']; ?>">
+                    <?php echo htmlspecialchars($j['prenom'] . ' ' . $j['nom'] . ' (' . $j['equipe'] . ')'); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
 
         <button type="submit" class="btn-valider">Créer mon compte</button>
     </form>
 </div>
+
+<script>
+function filtrer(inputId, selectId) { ... }
+</script>

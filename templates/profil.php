@@ -184,14 +184,7 @@ $msg = valider("msg");
 
 
 <script>
-function filtrer(inputId, selectId) {
-    var filtre = document.getElementById(inputId).value.toLowerCase();
-    var options = document.getElementById(selectId).options;
-    for (var i = 0; i < options.length; i++) {
-        var texte = options[i].text.toLowerCase();
-        options[i].style.display = texte.includes(filtre) ? '' : 'none';
-    }
-}
+function filtrer(inputId, selectId) { ... }
 </script>
 
 </div>

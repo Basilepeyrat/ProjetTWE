@@ -442,17 +442,13 @@ function listerMessagesLeagueDepuis($idLeague, $depuisId)
 //Basile: Cette partie concerne l'affichage des commentaires 
 
 //Basile: cette fonction permet de retourner tous les message d'un chat de league. 
-//Je voulais n'afficher qu'un nombre limité de message et en afficher plus avec un bouton 
-//Mais finalement on va afficher tous les message d'ou une limite élevée 
-function listerCommentaires($idMatch, $limite = 200, $debut = 0)
+function listerCommentairesDepuis($idMatch, $depuisId)
 {
-	$limite = (int) $limite; $debut = (int) $debut;
 	$SQL = "SELECT C.id, C.contenu, C.date_pub, C.user_id, U.pseudo
 			FROM COMMENTAIRE C
 			JOIN UTILISATEUR U ON U.id = C.user_id
-			WHERE C.match_id = '$idMatch'
-			ORDER BY C.id DESC
-			LIMIT $limite OFFSET $debut";
+			WHERE C.match_id = '$idMatch' AND C.id > '$depuisId'
+			ORDER BY C.id ASC";
 	return parcoursRs(SQLSelect($SQL));
 }
 
