@@ -10,8 +10,7 @@ $users = listerUtilisateursAdmin();
 ?>
 
 <div class="top-bar">
-    <h1>👥 Utilisateurs</h1>
-    <p>Réservé aux administrateurs</p>
+    <h1>Gestion des utilisateurs</h1>
 </div>
 
 <div class="container">
