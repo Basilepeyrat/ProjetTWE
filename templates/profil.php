@@ -9,182 +9,170 @@ if (!isset($_SESSION["connecte"]) || !$_SESSION["connecte"]) {
     die("");
 }
 
-$idUser = valider("idUser", "SESSION");
-$profil = getProfil($idUser);
-$stats  = getStatsProfil($idUser);
+$idUser      = valider("idUser", "SESSION");
+$profil      = getProfil($idUser);
+$stats       = getStatsProfil($idUser);
 $invitations = getInvitationsProfil($idUser);
-$joueurs = listerJoueurs();
-$equipes = listerEquipes();
-
-$msg = valider("msg");
+$joueurs     = listerJoueurs();
+$equipes     = listerEquipes();
+$msg         = valider("msg");
 ?>
 
-<div id="corps">
-
+<div class="top-bar">
     <h1>Mon Profil</h1>
+</div>
+
+<div class="container">
 
     <?php if ($msg): ?>
-        <p style="color:green;"><?= htmlspecialchars($msg) ?></p>
+        <p class="badge badge--success"><?= ($msg) ?></p>
     <?php endif; ?>
 
-    <!-- pdp de l'utilisateur-->
-    <section style="margin-bottom:30px;">
-        <h2>Photo de profil</h2>
+        <!-- Zone de changement de pseudo -->
+
+    <div class="card">
+        
         <?php if ($profil['pdp']): ?>
-            <img src="ressources/images_drapeaux/<?= htmlspecialchars($profil['pdp']) ?>"
-                 alt="Photo de profil" style="width:80px; height:80px; object-fit:contain;" />
-        <?php else: ?>
-            <p>Aucune photo définie.</p>
+            <img src="ressources/images_drapeaux/<?= ($profil['pdp']) ?>"
+                 alt="Photo de profil"
+                 class="entete-pp" />
         <?php endif; ?>
-    </section>
-
-    <!--  pseudo  -->
-    <section id = "pseudo">
-        <h2>Mon pseudo : <?= htmlspecialchars($profil['pseudo']) ?></h2>
+     
+        <h2><?= ($profil['pseudo']) ?></h2>
+     
         <form action="controleur.php" method="post">
-            <input type="hidden" name="action" value="Modifier pseudo" />
-            <label>Nouveau pseudo :
-                <input type="text" name="pseudo" value="<?= htmlspecialchars($profil['pseudo']) ?>" required />
-            </label>
-            <button type="submit">Modifier</button>
+     
+           <input type="hidden" name="action" value="Modifier pseudo" />
+     
+            <div class="form-group">
+                <label>Nouveau pseudo</label>
+                <input type="text" name="pseudo" value="<?= ($profil['pseudo']) ?>" required />
+            </div>
+     
+            <button type="submit" class="btn btn--primary">Modifier</button>
+     
         </form>
-    </section>
+    
+    </div>
 
-    <!-- équipe préférée -->
-    <section id = "equipePref">
-        <h2>Mon équipe préférée</h2>
+
+
+         <!-- Zone de choix de l'équipe préférée -->
+    <div class="card">
+
+        <h2>Équipe préférée</h2>
+        
         <?php if ($profil['equipe_nom']): ?>
             <p>
-                <img src="ressources/images_drapeaux/<?= htmlspecialchars($profil['image_drapeau']) ?>"
-                     alt="<?= htmlspecialchars($profil['equipe_nom']) ?>"
-                     style="width:40px; height:30px; object-fit:contain; margin-right:8px;" />
-                <?= htmlspecialchars($profil['equipe_nom']) ?>
+                <img src="ressources/images_drapeaux/<?= ($profil['image_drapeau']) ?>"
+                     alt="<?=  ($profil['equipe_nom']) ?>"
+                     class="entete-pp" />
+                <?=  ($profil['equipe_nom']) ?>
             </p>
         <?php else: ?>
-            <p>Aucune équipe définie.</p>
+            <p class="text-muted">Aucune équipe définie.</p>
         <?php endif; ?>
         <form action="controleur.php" method="post">
-			<input type="hidden" name="action" value="Modifier equipe" />
-			<label>Changer d'équipe :</label><br/>
-			<input type="text" id="filtreEquipe" placeholder="Tapez pour filtrer..."
-				oninput="filtrer('filtreEquipe','selectEquipe')"
-				style="margin-bottom:4px; padding:4px; width:300px;" />
-			<br/>
-			<select name="idEquipe" id="selectEquipe" size="6" >
-				<?php foreach ($equipes as $e): ?>
-					<option value="<?= $e['id'] ?>"
-						<?= ($e['id'] == ($profil['equipe_pref_id'] ?? '')) ? 'selected' : '' ?>>
-						<?= htmlspecialchars($e['nom']) ?>
-					</option>
-				<?php endforeach; ?>
-			</select>
-			<br/><button type="submit" >Modifier</button>
-		</form>
-    </section>
+            <input type="hidden" name="action" value="Modifier equipe" />
+            <div class="form-group">
+                <label>Changer d'équipe</label>
+                <input type="text" id="filtreEquipe" placeholder="Tapez pour filtrer..."
+                       oninput="filtrer('filtreEquipe','selectEquipe')" />
+                <select name="idEquipe" id="selectEquipe" size="6">
+                    <?php foreach ($equipes as $e): ?>
+                        <option value="<?= $e['id'] ?>"
+                            <?= ($e['id'] == ($profil['equipe_pref_id'] ?? '')) ? 'selected' : '' ?>>
+                            <?=  ($e['nom']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <button type="submit" class="btn btn--primary">Modifier</button>
+        </form>
+    </div>
 
-    <!-- joueur préféré -->
-    <section id="joueurPref">
-        <h2>Mon joueur préféré</h2>
+
+
+
+                    <!-- Zone de choix du joueur préféré -->
+    
+    <div class="card">
+
+        <h2>Joueur préféré</h2>
+        
         <?php if ($profil['joueur_nom']): ?>
             <p>
-                <img src="ressources/images_joueurs/<?= htmlspecialchars($profil['image_joueur']) ?>"
-                     alt="<?= htmlspecialchars($profil['joueur_prenom'] . ' ' . $profil['joueur_nom']) ?>"
-                     style="width:50px; height:50px; object-fit:cover; border-radius:50%; margin-right:8px;" />
-                <?= htmlspecialchars($profil['joueur_prenom'] . ' ' . $profil['joueur_nom']) ?>
+        
+            <img src="ressources/images_joueurs/<?= ($profil['joueur_pref_id']) ?>.png"
+                     alt="<?=  ($profil['joueur_nom']) ?>"
+                     class="entete-pp" />
+
+                <?=  ($profil['joueur_prenom'] . ' ' . $profil['joueur_nom']) ?>
+            
             </p>
+
         <?php else: ?>
-            <p>Aucun joueur défini.</p>
+            <p class="text-muted">Aucun joueur défini.</p>
         <?php endif; ?>
+
         <form action="controleur.php" method="post">
-			<input type="hidden" name="action" value="Modifier joueur" />
-			<label>Changer de joueur :</label><br/>
-			<input type="text" id="filtreJoueur" placeholder="Tapez pour filtrer..."
-				oninput="filtrer('filtreJoueur','selectJoueur')"
-				style="margin-bottom:4px; padding:4px; width:300px;" />
-			<br/>
-			<select name="idJoueur" id="selectJoueur" size="6" >
-				<?php foreach ($joueurs as $j): ?>
-					<option value="<?= $j['id'] ?>"
-						<?= ($j['id'] == ($profil['joueur_pref_id'] ?? '')) ? 'selected' : '' ?>>
-						<?= htmlspecialchars($j['prenom'] . ' ' . $j['nom'] . ' (' . $j['equipe'] . ')') ?>
-					</option>
-				<?php endforeach; ?>
-			</select>
-			<br/><button type="submit" >Modifier</button>
-		</form>
-	</section>
+            <input type="hidden" name="action" value="Modifier joueur" />
+            <div class="form-group">
+                <label>Changer de joueur</label>
+                <input type="text" id="filtreJoueur" placeholder="Tapez pour filtrer..."
+                       oninput="filtrer('filtreJoueur','selectJoueur')" />
+                <select name="idJoueur" id="selectJoueur" size="6">
+                    <?php foreach ($joueurs as $j): ?>
+                        <option value="<?= $j['id'] ?>"
+                            <?= ($j['id'] == ($profil['joueur_pref_id'] ?? '')) ? 'selected' : '' ?>>
+                            <?=  ($j['prenom'] . ' ' . $j['nom'] . ' (' . $j['equipe'] . ')') ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <button type="submit" class="btn btn--primary">Modifier</button>
+        </form>
+    </div>
 
-    <!-- invitation aux leagues -->
-    <section id = "invitLeagues">
-        <h2>Invitations à des leagues : 
-            <span>
-                <?= count($invitations) ?>
-            </span>
-        </h2>
-        <?php if (count($invitations) == 0): ?>
-            <p>Aucune invitation en attente.</p>
-        <?php else: ?>
-            <ul>
-            <?php foreach ($invitations as $inv): ?>
-                <li>
-                    League <strong><?= htmlspecialchars($inv['league_nom']) ?></strong>
-                    — reçue le <?= htmlspecialchars($inv['date_invitation']) ?>
-                    <form action="controleur.php" method="post" style="display:inline;">
-                        <input type="hidden" name="action" value="Accepter invitation" />
-                        <input type="hidden" name="idInvitation" value="<?= $inv['id'] ?>" />
-                        <button type="submit">Accepter</button>
-                    </form>
-                    <form action="controleur.php" method="post" style="display:inline;">
-                        <input type="hidden" name="action" value="Refuser invitation" />
-                        <input type="hidden" name="idInvitation" value="<?= $inv['id'] ?>" />
-                        <button type="submit">Refuser</button>
-                    </form>
-                </li>
-            <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
-    </section>
-
-    <!-- stats de l'utilisateur -->
-    <section id = "statsUser">
+    
+    <div class="card">
+        
         <h2>Mes statistiques</h2>
-        <table id = "stats">
+        
+        <table>
+        
             <tr>
                 <th>Matchs vus</th>
                 <td><?= $stats['nbVus'] ?></td>
             </tr>
+            
             <tr>
                 <th>Joueur le plus nommé MVP</th>
-                <td><?= htmlspecialchars($stats['mvp']) ?></td>
+                <td><?=  ($stats['mvp']) ?></td>
             </tr>
+            
             <tr>
                 <th>Équipe la plus vue</th>
-                <td><?= htmlspecialchars($stats['equipePlusVue']) ?></td>
+                <td><?=  ($stats['equipePlusVue']) ?></td>
             </tr>
+            
             <tr>
                 <th>Note moyenne donnée</th>
                 <td><?= $stats['noteMoy'] ?> / 10</td>
             </tr>
+            
             <tr>
                 <th>Présences au stade</th>
                 <td><?= $stats['nbStade'] ?></td>
             </tr>
+
         </table>
-    </section>
 
-    <!-- bouton déconnexion -->
-    <section>
-        <form action="controleur.php" method="post">
-            <input type="hidden" name="action" value="Logout" />
-            <button type="submit" >
-                Se déconnecter
-            </button>
-        </form>
-    </section>
+    </div>
 
-
-<script>
-function filtrer(inputId, selectId) { ... }
-</script>
+    <form action="controleur.php" method="post" class="mt-md">
+        <input type="hidden" name="action" value="Logout" />
+        <button type="submit" class="btn btn--danger">Se déconnecter</button>
+    </form>
 
 </div>
