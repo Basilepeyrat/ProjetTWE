@@ -157,8 +157,8 @@ session_start();
 						inscrireUtilisateur($pseudo, $passe, $equipe_id, $joueur_prefere);
 						header("Location: index.php?view=connexion");
 						exit;
-    }
-break;
+					}
+				break;
 				// Connexion //////////////////////////////////////////////////
 			case 'Connexion' :
 
@@ -266,11 +266,42 @@ break;
 	            $qs = "?view=profil";
 	        break;
 				
-			
+			case 'Maj score' :
+				$idMatch  = valider("idMatch");
+				$scoreDom = $_POST["score_dom"] ?? null;
+				$scoreExt = $_POST["score_ext"] ?? null;
+				if ($idMatch !== false && $scoreDom !== null && $scoreExt !== null) {
+					majScore($idMatch, $scoreDom, $scoreExt);
+				}
+				$qs = "?view=scores&msg=Score mis à jour";
+			break;
+
+			case 'Maj hdm' :
+				if ($idMatch  = valider("idMatch"))
+				if ($idJoueur = valider("idJoueur")) {
+					majHDM($idMatch, $idJoueur);
+				}
+				$qs = "?view=scores&msg=Homme du match mis à jour";
+			break;
+
+			case 'Ajouter but' :
+				if ($idJoueur = valider("idJoueur")) {
+					ajouterBut($idJoueur);
+				}
+				$qs = "?view=scores";
+			break;
+
+			case 'Ajouter passe' :
+				if ($idJoueur = valider("idJoueur")) {
+					ajouterPasse($idJoueur);
+				}
+				$qs = "?view=scores";
+			break;
 		}
 
 	}
 
+	//partie ajax nécessaire pour l'administration des scores
 
 	$isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
           strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
@@ -284,24 +315,13 @@ break;
 		echo json_encode(["ok" => $ok, "msg" => $msg]);
 		exit;
 	}
+
+	//fin de cette partie 
+
+	
 	// On redirige toujours vers la page index, mais on ne connait pas le répertoire de base
 	// On l'extrait donc du chemin du script courant : $_SERVER["PHP_SELF"]
 	// Par exemple, si $_SERVER["PHP_SELF"] vaut /chat/data.php, dirname($_SERVER["PHP_SELF"]) contient /chat
-
-	//partie ajax nécessaire pour l'administration des scores
-	$isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-          strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-
-	if ($isAjax) {
-		header('Content-Type: application/json; charset=utf-8');
-		ob_end_clean();
-		preg_match('/msg=([^&]*)/', $qs, $matches);
-		$msg = isset($matches[1]) ? urldecode($matches[1]) : 'OK';
-		$ok  = (strpos($msg, 'Impossible') === false && strpos($msg, 'Non') === false);
-		echo json_encode(["ok" => $ok, "msg" => $msg]);
-		exit;
-	}
-	//fin de cette partie
 
 	$urlBase = dirname($_SERVER["PHP_SELF"]) . "/index.php";
 	// On redirige vers la page index avec les bons arguments
@@ -313,13 +333,4 @@ break;
 	ob_end_flush();
 	
 ?>
-
-
-
-
-
-
-
-
-
 
