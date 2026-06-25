@@ -12,7 +12,6 @@ if (!isset($_SESSION["connecte"]) || !$_SESSION["connecte"]) {
 $idUser      = valider("idUser", "SESSION");
 $profil      = getProfil($idUser);
 $stats       = getStatsProfil($idUser);
-$invitations = getInvitationsProfil($idUser);
 $joueurs     = listerJoueurs();
 $equipes     = listerEquipes();
 $msg         = valider("msg");
