@@ -141,7 +141,7 @@ function getTopViewerLeague($idLeague)
             JOIN UTILISATEUR u ON a.user_id = u.id
             JOIN MEMBRE_LEAGUE ml ON a.user_id = ml.user_id
             WHERE ml.league_id = $idLeague
-            AND a.vu = 1
+            AND a.vu_ou IS NOT NULL
             GROUP BY u.id
             ORDER BY nb DESC
             LIMIT 1";
@@ -500,7 +500,7 @@ function getProfil($idUser)
 function getStatsProfil($idUser)
 {
     // Nombre de matchs vus
-    $nbVus = SQLGetChamp("SELECT COUNT(*) FROM AVIS_MATCH WHERE user_id='$idUser' AND vu=1");
+    $nbVus = SQLGetChamp("SELECT COUNT(*) FROM AVIS_MATCH WHERE user_id='$idUser' AND vu_ou IS NOT NULL");
     if (!$nbVus) $nbVus = 0;
 
     // Joueur le plus nommé MVP
@@ -517,7 +517,7 @@ function getStatsProfil($idUser)
             FROM AVIS_MATCH A
             JOIN MATCHS M ON M.id = A.match_id
             JOIN EQUIPE E ON E.id = M.equipe_dom_id OR E.id = M.equipe_ext_id
-            WHERE A.user_id='$idUser' AND A.vu=1
+            WHERE A.user_id='$idUser' AND A.vu_ou IS NOT NULL
             GROUP BY E.id ORDER BY nb DESC LIMIT 1";
     $rs = parcoursRs(SQLSelect($SQL));
     $equipePlusVue = (count($rs) > 0) ? $rs[0]['nom'] : 'Aucune';
@@ -527,7 +527,7 @@ function getStatsProfil($idUser)
     if (!$noteMoy) $noteMoy = 'N/A';
 
     // Présences au stade
-    $nbStade = SQLGetChamp("SELECT COUNT(*) FROM AVIS_MATCH WHERE user_id='$idUser' AND present_stade=1");
+    $nbStade = SQLGetChamp("SELECT COUNT(*) FROM AVIS_MATCH WHERE user_id='$idUser' AND vu_ou='stade'");
     if (!$nbStade) $nbStade = 0;
 
     return compact('nbVus', 'mvp', 'equipePlusVue', 'noteMoy', 'nbStade');
@@ -663,7 +663,7 @@ function listerUtilisateursAdmin()
                    COUNT(DISTINCT AM.match_id)  AS nb_matchs_vus
             FROM UTILISATEUR U
             LEFT JOIN MEMBRE_LEAGUE ML ON ML.user_id = U.id
-            LEFT JOIN AVIS_MATCH AM    ON AM.user_id = U.id AND AM.vu = 1
+            LEFT JOIN AVIS_MATCH AM ON AM.user_id = U.id AND AM.vu_ou IS NOT NULL
             GROUP BY U.id
             ORDER BY U.pseudo ASC";
     return parcoursRs(SQLSelect($SQL));
