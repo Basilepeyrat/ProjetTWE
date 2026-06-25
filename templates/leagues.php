@@ -20,14 +20,18 @@ $leagues = listerLeaguesUtilisateur($idUser);
 	<!-- Créer une nouvelle league -->
 	<form class="search" method="get" action="controleur.php">
 		<input type="text" name="nom" placeholder="nouvelle league" required="required" />
-		<button type="submit" name="action" value="Creer league" class="bt-plus">+</button>
+		<button type="submit" name="action" value="Creer league" class="bt-plus">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+		</button>
 	</form>
 	
 	<!-- rechercher une nouvelle league -->
 	<form class="search" method="get" action="index.php">
 		<input type="hidden" name="view" value="leagues" />
 		<input type="text" name="rechercheLeague" placeholder="Rechercher une league" />
-		<button type="submit" class="btn-plus" aria-label="Rechercher">🔍</button>
+		<button type="submit" class="btn-plus" aria-label="Rechercher">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+		</button>
 	</form>
 
 
