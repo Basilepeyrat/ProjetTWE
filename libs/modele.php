@@ -51,6 +51,15 @@ function listerJoueursMatch($idMatch)
     return parcoursRS(SQLSelect($sql));
 }
 
+// Récupère l'avis d'un utilisateur sur un match (note, où vu, mvp) — ou false s'il n'a pas encore noté
+function getAvisUtilisateur($idUser, $idMatch)
+{
+    $sql = "SELECT note_match, vu_ou, mvp_id FROM AVIS_MATCH
+            WHERE user_id = '$idUser' AND match_id = '$idMatch'";
+    $res = parcoursRS(SQLSelect($sql));
+    return count($res) ? $res[0] : false;
+}
+
 function getStatsMatchs($equipe_id)
 {
     $sql = "SELECT 
@@ -301,7 +310,8 @@ function ajouterUtilisateur($pseudo,$passe)
 function verifUserBdd($login,$passe)
 {
 
-	$SQL = "SELECT id FROM UTILISATEUR WHERE pseudo='$login' AND mot_de_passe='$passe'";
+	// AND blacklist = 0 : un utilisateur banni ne peut pas se connecter
+	$SQL = "SELECT id FROM UTILISATEUR WHERE pseudo='$login' AND mot_de_passe='$passe' AND blacklist = 0";
 
 	return SQLGetChamp($SQL); 
 
@@ -617,23 +627,17 @@ function listerMatchsTroisJours() {
 }
 
 function inscrireUtilisateur($pseudo, $password, $equipeId, $joueurPrefere) {
-    global $pdo;
+    $pseudo   = addslashes($pseudo);
+    $password = addslashes($password);
 
-    // on sécurise le mdp
-    $passwordHache = password_hash($password, PASSWORD_DEFAULT);
+    // equipe/joueur préférés : NULL si rien choisi (sinon violation de clé étrangère)
+    $equipe = ($equipeId   !== '' && $equipeId   !== null) ? "'" . addslashes($equipeId)      . "'" : "NULL";
+    $joueur = ($joueurPrefere !== '' && $joueurPrefere !== null) ? "'" . addslashes($joueurPrefere) . "'" : "NULL";
 
-    
-    $sql = "INSERT INTO UTILISATEUR (pseudo, passe, equipe_id, joueur_prefere) 
-            VALUES (:pseudo, :passe, :equipe_id, :joueur_prefere)";
-
-    $stmt = $pdo->prepare($sql);
-    
-    return $stmt->execute([
-        ':pseudo'          => $pseudo,
-        ':passe'           => $passwordHache,
-        ':equipe_id'       => $equipeId,
-        ':joueur_prefere'  => $joueurPrefere
-    ]);
+    // pdp est NOT NULL -> chaîne vide par défaut ; mot de passe en clair (cohérent avec le login du projet)
+    $sql = "INSERT INTO UTILISATEUR (pseudo, mot_de_passe, equipe_pref_id, joueur_pref_id, pdp)
+            VALUES ('$pseudo', '$password', $equipe, $joueur, '')";
+    return SQLInsert($sql);
 }
 
 //fonctions de gestion des scores pour l'admin
@@ -702,7 +706,7 @@ function listerMatchsVus($idUser)
             JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
             JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id
             JOIN AVIS_MATCH a ON a.match_id = m.id
-            WHERE a.user_id = '$idUser' AND a.vu = 1
+            WHERE a.user_id = '$idUser' AND a.vu_ou IS NOT NULL
             ORDER BY m.date_match ASC";
     return parcoursRS(SQLSelect($sql));
 }
@@ -736,7 +740,7 @@ function listerMatchsFiltres($poule = '', $vus = false, $idUser = null)
 
     // filtre "matchs vus par l'utilisateur"
     if ($vus) {
-        $sql .= " JOIN AVIS_MATCH a ON a.match_id = m.id AND a.user_id = '$idUser' AND a.vu = 1";
+        $sql .= " JOIN AVIS_MATCH a ON a.match_id = m.id AND a.user_id = '$idUser' AND a.vu_ou IS NOT NULL";
     }
 
     $sql .= " WHERE 1=1";

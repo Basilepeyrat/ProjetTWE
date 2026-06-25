@@ -75,6 +75,8 @@ SQLInsert($sql);
     echo "<p style='color:green;'>Avis enregistré !</p>";
 }
 
+// Avis existant de l'utilisateur, pour pré-remplir le formulaire (reflète ce qu'on vient d'enregistrer)
+$avis = getAvisUtilisateur($idUser, $idMatch);
 ?>
 
 
@@ -96,7 +98,8 @@ SQLInsert($sql);
     <select name="note">
         <?php
         for ($i = 0; $i <= 10; $i++) {
-            echo "<option value='$i'>$i</option>";
+            $sel = ($avis && $avis['note_match'] == $i) ? "selected" : "";
+            echo "<option value='$i' $sel>$i</option>";
         }
         ?>
     </select>
@@ -105,11 +108,12 @@ SQLInsert($sql);
 
     <!-- Vu -->
     <label>Où avez-vous vu le match ?</label>
+    <?php $vuActuel = $avis ? $avis['vu_ou'] : ''; ?>
     <select name="vu_ou">
-        <option value="">Pas vu</option>
-        <option value="maison">À la maison</option>
-        <option value="bar">Au bar</option>
-        <option value="stade">Au stade</option>
+        <option value=""       <?= ($vuActuel === '' || $vuActuel === null) ? 'selected' : '' ?>>Pas vu</option>
+        <option value="maison" <?= $vuActuel === 'maison' ? 'selected' : '' ?>>À la maison</option>
+        <option value="bar"    <?= $vuActuel === 'bar'    ? 'selected' : '' ?>>Au bar</option>
+        <option value="stade"  <?= $vuActuel === 'stade'  ? 'selected' : '' ?>>Au stade</option>
     </select>
 
     <br><br>
@@ -118,8 +122,9 @@ SQLInsert($sql);
 
     <label>MVP du match :</label>
     <select name="mvp_id">
+        <option value="">-- Aucun --</option>
         <?php foreach ($joueurs as $j) { ?>
-            <option value="<?= $j['id'] ?>">
+            <option value="<?= $j['id'] ?>" <?= ($avis && $avis['mvp_id'] == $j['id']) ? 'selected' : '' ?>>
                 <?= $j['prenom'] . " " . $j['nom'] ?>
             </option>
         <?php } ?>

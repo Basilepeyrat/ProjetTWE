@@ -155,7 +155,7 @@ session_start();
 					
 					if (!empty($pseudo) && !empty($passe)) {
 						inscrireUtilisateur($pseudo, $passe, $equipe_id, $joueur_prefere);
-						header("Location: index.php?view=connexion");
+						header("Location: index.php?view=login&msg=" . urlencode("Compte créé, tu peux te connecter !"));
 						exit;
 					}
 				break;
