@@ -494,6 +494,7 @@ function enregistrerCommentaire($idMatch, $idUser, $contenu)
 	           VALUES ('$idMatch', '$idUser', '$contenu')");
 }
 
+//Hugo : cette fonction permet de récupérer le profil de l'utilisateur, renvoie false si l'utilisateur n'existe pas
 function getProfil($idUser)
 {
     $SQL = "SELECT U.id, U.pseudo, U.pdp, U.equipe_pref_id, U.joueur_pref_id,
@@ -507,6 +508,7 @@ function getProfil($idUser)
     return (count($rs) > 0) ? $rs[0] : false;
 }
 
+//Hugo : récupère les statistiques que l'on va afficher sur le profil de l'utilisateur
 function getStatsProfil($idUser)
 {
     // Nombre de matchs vus
@@ -543,34 +545,29 @@ function getStatsProfil($idUser)
     return compact('nbVus', 'mvp', 'equipePlusVue', 'noteMoy', 'nbStade');
 }
 
-function getInvitationsProfil($idUser)
-{
-    $SQL = "SELECT I.id, L.nom AS league_nom, I.statut, I.date_invitation
-            FROM INVITATION I
-            JOIN LEAGUE L ON L.id = I.league_id
-            WHERE I.user_invite_id = '$idUser' AND I.statut = 'en_attente'
-            ORDER BY I.date_invitation DESC";
-    return parcoursRs(SQLSelect($SQL));
-}
 
+// Hugo : Met à jour le pseudo de l'utilisateur si c'est possible
 function updatePseudo($idUser, $pseudo)
 {
     $SQL = "UPDATE UTILISATEUR SET pseudo='$pseudo' WHERE id='$idUser'";
     return SQLUpdate($SQL);
 }
 
+// Hugo : Met à jour le joueur préféré de l'utilisateur
 function updateJoueurPref($idUser, $idJoueur)
 {
     $SQL = "UPDATE UTILISATEUR SET joueur_pref_id='$idJoueur' WHERE id='$idUser'";
     return SQLUpdate($SQL);
 }
 
+// Hugo : Met à jour l'équipe préférée de l'utilisateur
 function updateEquipePref($idUser, $idEquipe)
 {
     $SQL = "UPDATE UTILISATEUR SET equipe_pref_id='$idEquipe' WHERE id='$idUser'";
     return SQLUpdate($SQL);
 }
 
+//Hugo : on liste tous les joueurs pour les afficher dans la recherche dans profil
 function listerJoueurs()
 {
     $SQL = "SELECT J.id, J.prenom, J.nom, E.nom AS equipe
@@ -579,26 +576,15 @@ function listerJoueurs()
     return parcoursRs(SQLSelect($SQL));
 }
 
+//Hugo : on liste toutes les équipes pour les afficher dans la recherche dans profil
 function listerEquipes()
 {
     $SQL = "SELECT id, nom FROM EQUIPE ORDER BY nom";
     return parcoursRs(SQLSelect($SQL));
 }
 
-function accepterInvitation($idInvitation, $idUser)
-{
-    $league_id = SQLGetChamp("SELECT league_id FROM INVITATION WHERE id='$idInvitation' AND user_invite_id='$idUser'");
-    if ($league_id) {
-        SQLUpdate("UPDATE INVITATION SET statut='acceptee' WHERE id='$idInvitation'");
-        SQLInsert("INSERT IGNORE INTO MEMBRE_LEAGUE(user_id, league_id) VALUES ('$idUser', '$league_id')");
-    }
-}
 
-function refuserInvitation($idInvitation, $idUser)
-{
-    SQLUpdate("UPDATE INVITATION SET statut='refusee' WHERE id='$idInvitation' AND user_invite_id='$idUser'");
-}
-
+//Hugo : met à joueur le drapeau de l'équipe pref de l'utilisateur
 function updateDrapeauEquipePref($idUser, $idEquipe)
 {
     $imageDrapeau = SQLGetChamp("SELECT image_drapeau FROM EQUIPE WHERE id='$idEquipe'");
@@ -642,24 +628,9 @@ function inscrireUtilisateur($pseudo, $password, $equipeId, $joueurPrefere) {
 
 //fonctions de gestion des scores pour l'admin
 
-function getMatchAdmin($idMatch)
-{
-    $SQL = "SELECT M.id, M.date_match, M.score_dom, M.score_ext, M.mvpfifa_id,
-                   E1.nom AS equipe_dom, E1.image_drapeau AS image_dom,
-                   E2.nom AS equipe_ext, E2.image_drapeau AS image_ext,
-                   CONCAT(J.prenom, ' ', J.nom) AS hdm_nom
-            FROM MATCHS M
-            JOIN EQUIPE E1 ON E1.id = M.equipe_dom_id
-            JOIN EQUIPE E2 ON E2.id = M.equipe_ext_id
-            LEFT JOIN JOUEUR J ON J.id = M.mvpfifa_id
-            WHERE M.id = '$idMatch'";
-    $rs = parcoursRs(SQLSelect($SQL));
-    if (!count($rs)) return false;
-    $m = $rs[0];
-    $m['joueurs'] = listerJoueursMatch($idMatch);
-    return $m;
-}
+//fonctions pour l'admin : Hugo
 
+//liste tous les utilisateur pour la partie admin
 function listerUtilisateursAdmin()
 {
     $SQL = "SELECT U.id, U.pseudo, U.admin, U.blacklist,
@@ -673,12 +644,14 @@ function listerUtilisateursAdmin()
     return parcoursRs(SQLSelect($SQL));
 }
 
+//permet de mettre à jour le score d'un match
 function majScore($idMatch, $scoreDom, $scoreExt)
 {
     $SQL = "UPDATE MATCHS SET score_dom='$scoreDom', score_ext='$scoreExt' WHERE id='$idMatch'";
     return SQLUpdate($SQL);
 }
 
+//permet de mettre à jour le MVP désigné par la FIFA
 function majHDM($idMatch, $idJoueur)
 {
     $ancienHDM = SQLGetChamp("SELECT mvpfifa_id FROM MATCHS WHERE id='$idMatch'");
@@ -688,16 +661,20 @@ function majHDM($idMatch, $idJoueur)
     SQLUpdate("UPDATE JOUEUR SET nb_hdm = nb_hdm + 1 WHERE id='$idJoueur'");
 }
 
+
+//permet d'ajouter un but à un joueur
 function ajouterBut($idJoueur)
 {
     SQLUpdate("UPDATE JOUEUR SET buts = buts + 1 WHERE id='$idJoueur'");
 }
 
+//permet d'ajouter une passe décisive à un joueur
 function ajouterPasse($idJoueur)
 {
     SQLUpdate("UPDATE JOUEUR SET passe_dec = passe_dec + 1 WHERE id='$idJoueur'");
 }
 
+//affiche les matchs vus par un utilisateur
 function listerMatchsVus($idUser)
 {
     $sql = "SELECT m.id, e1.nom AS equipe_dom, e2.nom AS equipe_ext,
