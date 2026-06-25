@@ -150,6 +150,25 @@ function getTopViewerLeague($idLeague)
     return count($res) ? $res[0] : null;
 }
 
+function listerMatchsEquipe($idEquipe)
+{
+    $sql = "SELECT
+                m.id,
+                m.date_match,
+                m.score_dom,
+                m.score_ext,
+                e1.nom AS equipe_dom,
+                e2.nom AS equipe_ext
+            FROM MATCHS m
+            JOIN EQUIPE e1 ON m.equipe_dom_id = e1.id
+            JOIN EQUIPE e2 ON m.equipe_ext_id = e2.id
+            WHERE m.equipe_dom_id = $idEquipe
+               OR m.equipe_ext_id = $idEquipe
+            ORDER BY m.date_match DESC";
+
+    return parcoursRS(SQLSelect($sql));
+}
+
 
 //eleonore-fin
 
