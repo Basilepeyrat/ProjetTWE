@@ -221,7 +221,7 @@ function listerUtilisateurs($classe = "both")
 	// Lorsqu'elle vaut "bl", elle ne renvoie que les utilisateurs blacklistés
 	// Lorsqu'elle vaut "nbl", elle ne renvoie que les utilisateurs non blacklistés
 
-	$SQL = "select * from users";
+	$SQL = "select * from UTILISATEUR";
 	return parcoursRs(SQLSelect($SQL));
 
 }
@@ -229,7 +229,7 @@ function listerUtilisateurs($classe = "both")
 function interdireUtilisateur($idUser)
 {
 	// NEVER TRUST USER INPUT
-	// exemple : ?action=Interdire&idUser=3;DROP TABLE users;
+	// exemple : ?action=Interdire&idUser=3;DROP TABLE UTILISATEUR;
 	// INJECTION SQL 
 	// approche PRO : requêtes préparées 
 	// equivalent d'un printf("format contenant des %s", argument)
@@ -237,32 +237,32 @@ function interdireUtilisateur($idUser)
 	// dans ce projet pédagogique : 2 contre-mesures
 	// 1) encadrer les entrées par des apostrophes
 	// Insuffisant si on injecte
-	// exemple : ?action=Interdire&idUser=3';DROP TABLE users;'; 
+	// exemple : ?action=Interdire&idUser=3';DROP TABLE UTILISATEUR;'; 
 	// 2) banaliser les caractères spéciaux des entrées utilisateur 
 	// "échapper" : on ajoute \ avant le caractère
 	// cf. valider le fait déjà en utilisant addslashes !!
 	
 	// cette fonction affecte le booléen "blacklist" à vrai 
-	$SQL ="UPDATE users SET blacklist=1 WHERE id='$idUser'";
+	$SQL ="UPDATE UTILISATEUR SET blacklist=1 WHERE id='$idUser'";
 	SQLUpdate($SQL); 
 }
 
 function autoriserUtilisateur($idUser)
 {
 	// cette fonction affecte le booléen "blacklist" à faux 
-	$SQL ="UPDATE users SET blacklist=0 WHERE id='$idUser'";
+	$SQL ="UPDATE UTILISATEUR SET blacklist=0 WHERE id='$idUser'";
 	SQLUpdate($SQL); 
 }
 
 function updateAdmin($idUser, $val)
 { 
-	$SQL ="UPDATE users SET admin=$val WHERE id='$idUser'";
+	$SQL ="UPDATE UTILISATEUR SET admin=$val WHERE id='$idUser'";
 	SQLUpdate($SQL); 
 }
 
 function supprimerUtilisateur($idUser)
 { 
-	$SQL ="DELETE FROM users WHERE id='$idUser'";
+	$SQL ="DELETE FROM UTILISATEUR WHERE id='$idUser'";
 	SQLDelete($SQL); 
 }
 
