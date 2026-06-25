@@ -10,7 +10,7 @@ include_once("libs/maLibUtils.php");
 include_once("libs/maLibSecurisation.php");
 
 securiser("login"); // page privée
-
+securiserMembre($idUser, $idLeague);
 $idUser   = valider("idUser", "SESSION");
 $idLeague = valider("idLeague");
 $league   = getLeague($idLeague);

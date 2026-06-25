@@ -88,4 +88,13 @@ function securiserAdmin($urlBad)
 	}
 }
 
+//Basile: cette fonction permet de vérifier qu'un utilisateur appartient bien à la league avant d'acceder à la page de la league
+function securiserMembre($idUser, $idLeague)
+{
+	if (!estMembre($idUser, $idLeague)) {
+		$urlBase = dirname($_SERVER["PHP_SELF"]) . "/index.php";
+		header("Location:$urlBase?view=leagues&msg=" . urlencode("Tu n'es pas membre de cette league"));
+		die("");
+	}
+}
 ?>

@@ -192,7 +192,7 @@ function getMatchs(int $userId, string $filtreEquipe = '', string $filtrePoule =
     $stmt->execute($params);
     return $stmt->fetchAll();
 }
-
+//importé par basile
 //DEBUT EXERCICE 2
 function listerUtilisateurs($classe = "both")
 {
@@ -281,34 +281,25 @@ function ajouterUtilisateur($pseudo,$passe)
 
 function verifUserBdd($login,$passe)
 {
-	// Vérifie l'identité d'un utilisateur 
-	// dont les identifiants sont passes en paramètre
-	// renvoie faux si user inconnu
-	// renvoie l'id de l'utilisateur si succès
 
-	// Adapté au schéma ProjetTWE : table UTILISATEUR, colonne mot_de_passe.
 	$SQL = "SELECT id FROM UTILISATEUR WHERE pseudo='$login' AND mot_de_passe='$passe'";
 
-	// On utilise SQLGetChamp
-	// si on avait besoin de plus d'un champ
-	// on aurait du utiliser SQLSelect
-	
 	return SQLGetChamp($SQL); 
-	// $tab = parcoursRs(SQLSelect($SQL)); 
-	// if (count($tab)) return $tab[0]["id"]; 
+
 }
 
 function isAdmin($idUser)
 {
-	// Le schéma ProjetTWE n'a pas (encore) de notion d'administrateur dans UTILISATEUR.
-	// On renvoie 0 pour ne pas planter sur une colonne inexistante.
-	// Si tu ajoutes une colonne `admin` à UTILISATEUR plus tard, remplace par :
-	//   $SQL = "SELECT admin FROM UTILISATEUR WHERE id='$idUser'"; return SQLGetChamp($SQL);
-	return 0;
+	$SQL = "SELECT admin FROM UTILISATEUR WHERE id='$idUser'";
+	return SQLGetChamp($SQL);
 }
 
 //FIN EXERCICE 4
+
+
 //Basile - début
+
+//Basile: cette fonction permet de récuperer toutes les leagues que les utililsateurs à rejoint.
 function listerLeaguesUtilisateur($idUser)
 {
 	$SQL = "SELECT L.id, L.nom, L.createur_id,
@@ -322,7 +313,7 @@ function listerLeaguesUtilisateur($idUser)
 	return parcoursRs(SQLSelect($SQL));
 }
 
-
+//Basile: Cette fonction permet de récuperer les caractéristiques d'une league
 function apercuLeague($idLeague)
 {
 	$SQL = "SELECT L.id, L.nom, U.pseudo AS createur,
@@ -334,7 +325,7 @@ function apercuLeague($idLeague)
 	return count($tab) ? $tab[0] : false;
 }
 
-
+//Basile: Cette fonction permet d'ajouter une league dans la base de donnée
 function creerLeague($nom, $idCreateur)
 {
 	$idLeague = SQLInsert("INSERT INTO LEAGUE(nom, createur_id) VALUES ('$nom', '$idCreateur')");
@@ -342,6 +333,26 @@ function creerLeague($nom, $idCreateur)
 	return $idLeague;
 }
 
+//Basile Cette fonction permet de savoir si la personne est membre de la league ou non notament pour reserver la page aux membre 
+//la fonction de securisation est dans maLibSecurisation
+function estMembre($idUser, $idLeague)
+{
+	return SQLGetChamp("SELECT COUNT(*) FROM MEMBRE_LEAGUE
+	                    WHERE user_id='$idUser' AND league_id='$idLeague'") > 0;
+}
+//cette fonction permet de s'assurer de que la league existe pour que la page charge correctement.
+function getLeague($idLeague)
+{
+	$SQL = "SELECT L.id, L.nom, L.createur_id, U.pseudo AS createur
+			FROM LEAGUE L
+			JOIN UTILISATEUR U ON U.id = L.createur_id
+			WHERE L.id = '$idLeague'";
+	$tab = parcoursRs(SQLSelect($SQL));
+	return count($tab) ? $tab[0] : false;
+}
+
+//Basile: Cette fonction permet de demander à rejoindre une league, 
+// le membre qui à créé la league peut alors accepter ou rejeter la demande.
 function demanderAdhesion($idUser, $idLeague)
 {
 	// Déjà membre ? on ne fait rien
@@ -360,14 +371,80 @@ function demanderAdhesion($idUser, $idLeague)
 	return "ok";
 }
 
+// Basile: Cette fonction permet d'afficher les demandes d'adhésion en attente d'une league (avec le pseudo du demandeur)
+function listerDemandesEnAttente($idLeague)
+{
+	$SQL = "SELECT I.id, I.user_invite_id, U.pseudo, I.date_invitation
+			FROM INVITATION I
+			JOIN UTILISATEUR U ON U.id = I.user_invite_id
+			WHERE I.league_id = '$idLeague' AND I.statut = 'en_attente'
+			ORDER BY I.date_invitation ASC";
+	return parcoursRs(SQLSelect($SQL));
+}
+//Basile: Cette fonction permet d'accepter une demande en mettant à jours Invitation et en mettant à jours les membres de la league en faisant attention
+function accepterDemande($idInvitation)
+{
+	$tab = parcoursRs(SQLSelect("SELECT league_id, user_invite_id FROM INVITATION WHERE id='$idInvitation'"));
+	if (!count($tab)) return;
+	$d = $tab[0];
+	SQLInsert("INSERT INTO MEMBRE_LEAGUE(user_id, league_id)
+	           VALUES ('".$d['user_invite_id']."', '".$d['league_id']."')");
+	SQLUpdate("UPDATE INVITATION SET statut='accepte' WHERE id='$idInvitation'");
+}
 
+//Basile: Cette fonction permet de refuser une demande en mettant à jours Invitation
+function refuserDemande($idInvitation)
+{
+	SQLUpdate("UPDATE INVITATION SET statut='refuse' WHERE id='$idInvitation'");
+}
+
+//Basile: Cette partie concerne l'affichage du chat de league
+
+
+//Basile: Cette fonction permet d'enregistrer les messages d'un utilisateur dans la base de données.
 function enregistrerMessageLeague($idLeague, $idUser, $contenu)
 {
 	SQLInsert("INSERT INTO MESSAGE_CHAT(league_id, user_id, contenu)
 	           VALUES ('$idLeague', '$idUser', '$contenu')");
 }
-// 10 commentaires d'un match, du plus récent au plus ancien, avec décalage (pagination)
-function listerCommentaires($idMatch, $limite = 10, $debut = 0)
+//Basile: cette fonction permet de retourner tous les message d'un chat de league.
+function listerMessagesLeague($idLeague)
+{
+	$SQL = "SELECT MC.id, MC.contenu, MC.date_envoi, MC.user_id, U.pseudo
+			FROM MESSAGE_CHAT MC
+			JOIN UTILISATEUR U ON U.id = MC.user_id
+			WHERE MC.league_id = '$idLeague'
+			ORDER BY MC.date_envoi ASC, MC.id ASC";
+	return parcoursRs(SQLSelect($SQL));
+}
+
+//Basile: cette fonction permet de voir quelle est le dernier message lu afin d'afficher le nombre de messages non lu
+function marquerLeagueLue($idUser, $idLeague)
+{
+	$SQL = "UPDATE MEMBRE_LEAGUE
+			SET dernier_msg_lu = (SELECT IFNULL(MAX(id), 0) FROM MESSAGE_CHAT WHERE league_id = '$idLeague')
+			WHERE user_id = '$idUser' AND league_id = '$idLeague'";
+	SQLUpdate($SQL);
+}
+
+//Basile: cette fonction permet d'afficher le nombre de messages non lu
+function listerMessagesLeagueDepuis($idLeague, $depuisId)
+{
+	$SQL = "SELECT MC.id, MC.contenu, MC.date_envoi, MC.user_id, U.pseudo
+			FROM MESSAGE_CHAT MC
+			JOIN UTILISATEUR U ON U.id = MC.user_id
+			WHERE MC.league_id = '$idLeague' AND MC.id > '$depuisId'
+			ORDER BY MC.id ASC";
+	return parcoursRs(SQLSelect($SQL));
+}
+
+
+//Basile: Cette partie concerne l'affichage des commentaires 
+
+//Basile: cette fonction permet de retourner tous les message d'un chat de league. 
+//Je voulais n'afficher qu'un nombre limité de message et en afficher plus avec un bouton 
+//Mais finalement on va afficher tous les message d'ou une limite élevée 
+function listerCommentaires($idMatch, $limite = 200, $debut = 0)
 {
 	$limite = (int) $limite; $debut = (int) $debut;
 	$SQL = "SELECT C.id, C.contenu, C.date_pub, C.user_id, U.pseudo
@@ -385,79 +462,12 @@ function compterCommentaires($idMatch)
 	return SQLGetChamp("SELECT COUNT(*) FROM COMMENTAIRE WHERE match_id = '$idMatch'");
 }
 
-// ajouter un commentaire
+//Basile: Cette fonction permet d'enregistrer les messages d'un utilisateur dans la base de données.
 function enregistrerCommentaire($idMatch, $idUser, $contenu)
 {
 	SQLInsert("INSERT INTO COMMENTAIRE(match_id, user_id, contenu)
 	           VALUES ('$idMatch', '$idUser', '$contenu')");
 }
-
-
-function getLeague($idLeague)
-{
-	$SQL = "SELECT L.id, L.nom, L.createur_id, U.pseudo AS createur
-			FROM LEAGUE L
-			JOIN UTILISATEUR U ON U.id = L.createur_id
-			WHERE L.id = '$idLeague'";
-	$tab = parcoursRs(SQLSelect($SQL));
-	return count($tab) ? $tab[0] : false;
-}
-
-function listerMessagesLeague($idLeague)
-{
-	$SQL = "SELECT MC.id, MC.contenu, MC.date_envoi, MC.user_id, U.pseudo
-			FROM MESSAGE_CHAT MC
-			JOIN UTILISATEUR U ON U.id = MC.user_id
-			WHERE MC.league_id = '$idLeague'
-			ORDER BY MC.date_envoi ASC, MC.id ASC";
-	return parcoursRs(SQLSelect($SQL));
-}
-function marquerLeagueLue($idUser, $idLeague)
-{
-	$SQL = "UPDATE MEMBRE_LEAGUE
-			SET dernier_msg_lu = (SELECT IFNULL(MAX(id), 0) FROM MESSAGE_CHAT WHERE league_id = '$idLeague')
-			WHERE user_id = '$idUser' AND league_id = '$idLeague'";
-	SQLUpdate($SQL);
-}
-// Les demandes d'adhésion en attente d'une league (avec le pseudo du demandeur)
-function listerDemandesEnAttente($idLeague)
-{
-	$SQL = "SELECT I.id, I.user_invite_id, U.pseudo, I.date_invitation
-			FROM INVITATION I
-			JOIN UTILISATEUR U ON U.id = I.user_invite_id
-			WHERE I.league_id = '$idLeague' AND I.statut = 'en_attente'
-			ORDER BY I.date_invitation ASC";
-	return parcoursRs(SQLSelect($SQL));
-}
-
-// Accepter une demande : ajoute le membre + passe la demande à 'accepte'
-function accepterDemande($idInvitation)
-{
-	$tab = parcoursRs(SQLSelect("SELECT league_id, user_invite_id FROM INVITATION WHERE id='$idInvitation'"));
-	if (!count($tab)) return;
-	$d = $tab[0];
-	// INSERT IGNORE : si déjà membre, on ne plante pas (clé primaire user_id+league_id)
-	SQLInsert("INSERT IGNORE INTO MEMBRE_LEAGUE(user_id, league_id)
-	           VALUES ('".$d['user_invite_id']."', '".$d['league_id']."')");
-	SQLUpdate("UPDATE INVITATION SET statut='accepte' WHERE id='$idInvitation'");
-}
-
-// Refuser une demande : on passe juste son statut à 'refuse'
-function refuserDemande($idInvitation)
-{
-	SQLUpdate("UPDATE INVITATION SET statut='refuse' WHERE id='$idInvitation'");
-}
-function listerMessagesLeagueDepuis($idLeague, $depuisId)
-{
-	$SQL = "SELECT MC.id, MC.contenu, MC.date_envoi, MC.user_id, U.pseudo
-			FROM MESSAGE_CHAT MC
-			JOIN UTILISATEUR U ON U.id = MC.user_id
-			WHERE MC.league_id = '$idLeague' AND MC.id > '$depuisId'
-			ORDER BY MC.id ASC";
-	return parcoursRs(SQLSelect($SQL));
-}
-
-
 
 function getProfil($idUser)
 {
