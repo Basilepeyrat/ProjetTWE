@@ -52,8 +52,8 @@ include_once "libs/modele.php";
 	<?php endif; ?>
 	<?php
 	// Le lien Utilisateurs n'est visible que pour les administrateurs
-	if (valider("isAdmin","SESSION"))
+	if (valider("isAdmin","SESSION")){
 		echo '<a href="index.php?view=users">Utilisateurs</a>';
-		echo '<a href="index.php?view=users">Scores</a>';
-	?>
+		echo '<a href="index.php?view=scores">Scores</a>';
+	} ?>
 </div>
