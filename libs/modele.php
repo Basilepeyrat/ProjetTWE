@@ -621,4 +621,65 @@ function inscrireUtilisateur($pseudo, $password, $equipeId, $joueurPrefere) {
     ]);
 }
 
+//fonctions de gestion des scores pour l'admin
+
+function getMatchAdmin($idMatch)
+{
+    $SQL = "SELECT M.id, M.date_match, M.score_dom, M.score_ext, M.mvpfifa_id,
+                   E1.nom AS equipe_dom, E1.image_drapeau AS image_dom,
+                   E2.nom AS equipe_ext, E2.image_drapeau AS image_ext,
+                   CONCAT(J.prenom, ' ', J.nom) AS hdm_nom
+            FROM MATCHS M
+            JOIN EQUIPE E1 ON E1.id = M.equipe_dom_id
+            JOIN EQUIPE E2 ON E2.id = M.equipe_ext_id
+            LEFT JOIN JOUEUR J ON J.id = M.mvpfifa_id
+            WHERE M.id = '$idMatch'";
+    $rs = parcoursRs(SQLSelect($SQL));
+    if (!count($rs)) return false;
+    $m = $rs[0];
+    $m['joueurs'] = listerJoueursMatch($idMatch);
+    return $m;
+}
+
+function listerUtilisateursAdmin()
+{
+    $SQL = "SELECT U.id, U.pseudo, U.admin, U.blacklist,
+                   COUNT(DISTINCT ML.league_id) AS nb_leagues,
+                   COUNT(DISTINCT AM.match_id)  AS nb_matchs_vus
+            FROM UTILISATEUR U
+            LEFT JOIN MEMBRE_LEAGUE ML ON ML.user_id = U.id
+            LEFT JOIN AVIS_MATCH AM    ON AM.user_id = U.id AND AM.vu = 1
+            GROUP BY U.id
+            ORDER BY U.pseudo ASC";
+    return parcoursRs(SQLSelect($SQL));
+}
+
+function majScore($idMatch, $scoreDom, $scoreExt)
+{
+    $SQL = "UPDATE MATCHS SET score_dom='$scoreDom', score_ext='$scoreExt' WHERE id='$idMatch'";
+    return SQLUpdate($SQL);
+}
+
+function majHDM($idMatch, $idJoueur)
+{
+    $ancienHDM = SQLGetChamp("SELECT mvpfifa_id FROM MATCHS WHERE id='$idMatch'");
+    if ($ancienHDM && $ancienHDM > 0)
+        SQLUpdate("UPDATE JOUEUR SET nb_hdm = nb_hdm - 1 WHERE id='$ancienHDM'");
+    SQLUpdate("UPDATE MATCHS SET mvpfifa_id='$idJoueur' WHERE id='$idMatch'");
+    SQLUpdate("UPDATE JOUEUR SET nb_hdm = nb_hdm + 1 WHERE id='$idJoueur'");
+}
+
+function ajouterBut($idJoueur)
+{
+    SQLUpdate("UPDATE JOUEUR SET buts = buts + 1 WHERE id='$idJoueur'");
+}
+
+function ajouterPasse($idJoueur)
+{
+    SQLUpdate("UPDATE JOUEUR SET passe_dec = passe_dec + 1 WHERE id='$idJoueur'");
+}
+
+
+
+
 ?>
