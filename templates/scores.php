@@ -10,8 +10,12 @@ $isAjax  = isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
 if ($idMatch && $isAjax) {
-    $m = getMatchById($idMatch);
-    if (!$m) { echo "<p class='text-muted'>Match introuvable</p>"; exit; }
+    $rs = getMatchById($idMatch);
+    if (!$rs) { echo "<p class='text-muted'>Match introuvable</p>"; exit; }
+    $m = $rs[0];
+    $m['joueurs']    = listerJoueursMatch($idMatch);
+    $m['mvpfifa_id'] = SQLGetChamp("SELECT mvpfifa_id FROM MATCHS WHERE id='$idMatch'");
+    $m['hdm_nom']    = SQLGetChamp("SELECT CONCAT(J.prenom, ' ', J.nom) FROM MATCHS M JOIN JOUEUR J ON J.id = M.mvpfifa_id WHERE M.id='$idMatch'");
     ?>
 
     <form id="form-score">
@@ -32,68 +36,61 @@ if ($idMatch && $isAjax) {
             </div>
         </div>
 
-        <p class="text-muted mt-md"><strong>⚽ Buteurs</strong></p>
-        <input type="text" id="filtre-but" placeholder="Tapez pour filtrer..."
-               oninput="filtrerSelect('filtre-but','sel-but')" />
-        <div style="display:flex;gap:8px;">
+        <div class="form-group mt-md">
+            <label>Buteurs</label>
+            <input type="text" id="filtre-but" placeholder="Tapez pour filtrer..."
+                   oninput="filtrerSelect('filtre-but','sel-but')" />
             <select id="sel-but" size="5">
-                <option value="">Sélectionner…</option>
+                <option value="">Sélectionner...</option>
                 <?php foreach ($m['joueurs'] as $j): ?>
                     <option value="<?= $j['id'] ?>">
                         <?= htmlspecialchars($j['prenom'].' '.$j['nom']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
-            <button type="button" id="btn-but" class="btn btn--primary" style="width:auto;">+</button>
+            <button type="button" id="btn-but" class="btn btn--primary mt-sm">Ajouter buteur</button>
+            <div id="liste-buteurs" class="mt-sm"></div>
         </div>
-        <div id="tags-buteurs" class="mt-sm"></div>
 
-        <p class="text-muted mt-md"><strong>Passeurs décisifs</strong></p>
-        <input type="text" id="filtre-pas" placeholder="Tapez pour filtrer..."
-               oninput="filtrerSelect('filtre-pas','sel-pas')" />
-        <div style="display:flex;gap:8px;">
+        <div class="form-group">
+            <label>Passeurs decisifs</label>
+            <input type="text" id="filtre-pas" placeholder="Tapez pour filtrer..."
+                   oninput="filtrerSelect('filtre-pas','sel-pas')" />
             <select id="sel-pas" size="5">
-                <option value="">Sélectionner…</option>
+                <option value="">Sélectionner...</option>
                 <?php foreach ($m['joueurs'] as $j): ?>
                     <option value="<?= $j['id'] ?>">
                         <?= htmlspecialchars($j['prenom'].' '.$j['nom']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
-            <button type="button" id="btn-pas" class="btn btn--primary" style="width:auto;">+</button>
+            <button type="button" id="btn-pas" class="btn btn--primary mt-sm">Ajouter passeur</button>
+            <div id="liste-passeurs" class="mt-sm"></div>
         </div>
-        <div id="tags-passeurs" class="mt-sm"></div>
 
-        <p class="text-muted mt-md"><strong>Homme du match FIFA</strong></p>
-        <?php if ($m['mvpfifa_id'] > 0 && $m['hdm_nom']): ?>
-            <p>
-                <span class="badge badge--success">✓ <?= htmlspecialchars($m['hdm_nom']) ?></span>
-                <?php if ($m['score_dom'] !== null): ?>
-                    <span class="badge badge--rating">
-                        <?= $m['score_dom'] ?> - <?= $m['score_ext'] ?>
-                    </span>
-                <?php endif; ?>
-            </p>
-        <?php endif; ?>
-        <input type="text" id="filtre-hdm" placeholder="Tapez pour filtrer..."
-               oninput="filtrerSelect('filtre-hdm','sel-hdm')" />
-        <select name="idJoueur" id="sel-hdm" size="5">
-            <?php foreach ($m['joueurs'] as $j): ?>
-                <option value="<?= $j['id'] ?>"
-                        <?= ($j['id'] == $m['mvpfifa_id']) ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($j['prenom'].' '.$j['nom']) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+        <div class="form-group">
+            <label>Homme du match FIFA</label>
+            <?php if ($m['mvpfifa_id'] > 0 && $m['hdm_nom']): ?>
+                <p><span class="badge badge--success">Actuellement : <?= htmlspecialchars($m['hdm_nom']) ?></span></p>
+            <?php endif; ?>
+            <input type="text" id="filtre-hdm" placeholder="Tapez pour filtrer..."
+                   oninput="filtrerSelect('filtre-hdm','sel-hdm')" />
+            <select name="idJoueur" id="sel-hdm" size="5">
+                <?php foreach ($m['joueurs'] as $j): ?>
+                    <option value="<?= $j['id'] ?>"
+                            <?= ($j['id'] == $m['mvpfifa_id']) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($j['prenom'].' '.$j['nom']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
-        <button type="submit" class="btn btn--success mt-md">💾 Enregistrer</button>
+        <button type="submit" class="btn btn--success">Enregistrer</button>
     </form>
 
     <?php
     exit;
 }
-
-// ── Page normale ──────────────────────────────────────────────────────────────
 
 $tousLesMatchs = listerMatchsTroisJours();
 
@@ -116,13 +113,13 @@ foreach ($tousLesMatchs as $match) {
 ?>
 
 <div class="top-bar">
-    <h1>⚙️ Scores — Admin</h1>
-    <p>Cliquez sur un match pour modifier son score, ses buteurs et son HDM</p>
+    <h1>Scores</h1>
+    <p>Cliquez sur un match pour modifier</p>
 </div>
 
 <div class="container">
 
-    <div id="toast"></div>
+    <div id="message" class="mt-sm"></div>
 
     <div class="dashboard-matchs">
     <?php foreach ($colonnes as $titre => $matchs): ?>
@@ -136,8 +133,8 @@ foreach ($tousLesMatchs as $match) {
                     $score    = $scoreSet ? $m['score_dom'].' - '.$m['score_ext'] : '? - ?';
                 ?>
                     <div class="card match-card"
-                         data-id="<?= $m['id'] ?>"
-                         onclick="togglePanneau(this, <?= $m['id'] ?>)">
+                         data-nom="<?= htmlspecialchars(strtolower($m['equipe_dom'].' '.$m['equipe_ext'])) ?>"
+                         onclick="ouvrirFermer(this, <?= $m['id'] ?>)">
                         <div class="match-card__score">
                             <div class="match-card__team"><?= htmlspecialchars($m['equipe_dom']) ?></div>
                             <div class="match-card__value">
@@ -147,14 +144,12 @@ foreach ($tousLesMatchs as $match) {
                             </div>
                             <div class="match-card__team"><?= htmlspecialchars($m['equipe_ext']) ?></div>
                         </div>
-                        <div class="match-card__date">
-                            <?= date('H:i', strtotime($m['date_match'])) ?>
-                        </div>
+                        <div class="match-card__date"><?= date('H:i', strtotime($m['date_match'])) ?></div>
                     </div>
                     <div class="card panneau" id="panneau-<?= $m['id'] ?>"
-                         style="display:none;border-top:2px solid var(--color-primary-light);"
+                         style="display:none;"
                          onclick="event.stopPropagation()">
-                        <p class="text-muted">Chargement…</p>
+                        <p class="text-muted">Chargement...</p>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -165,16 +160,16 @@ foreach ($tousLesMatchs as $match) {
 </div>
 
 <script>
-var buteurs      = {};
-var passeurs     = {};
+var buteurs  = {};
+var passeurs = {};
 var panneauOuvert = null;
 
-function showToast(msg, ok) {
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = ok ? 'toast toast--success' : 'toast toast--danger';
-    t.style.display = 'block';
-    setTimeout(function() { t.style.display = 'none'; }, 2500);
+function afficherMessage(msg, ok) {
+    var m = document.getElementById('message');
+    m.textContent = msg;
+    m.className = ok ? 'badge badge--success' : 'badge badge--danger';
+    m.style.display = 'block';
+    setTimeout(function() { m.style.display = 'none'; }, 2500);
 }
 
 function fermerPanneau() {
@@ -186,61 +181,57 @@ function fermerPanneau() {
     passeurs = {};
 }
 
-function togglePanneau(carte, idMatch) {
+function ouvrirFermer(carte, idMatch) {
     var panneau = document.getElementById('panneau-' + idMatch);
-
     if (panneau.style.display !== 'none') {
         fermerPanneau();
         return;
     }
-
     fermerPanneau();
-
     panneau.style.display = 'block';
-    panneau.innerHTML = '<p class="text-muted">Chargement…</p>';
+    panneau.innerHTML = '<p class="text-muted">Chargement...</p>';
     panneauOuvert = panneau;
-
     fetch('index.php?view=scores&idMatch=' + idMatch, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(function(r) { return r.text(); })
     .then(function(html) {
         panneau.innerHTML = html;
-        bindForms(idMatch);
+        initialiserFormulaire(idMatch);
         panneau.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
 }
 
-function ajouterTag(type, idJoueur, nomJoueur) {
-    var store = type === 'but' ? buteurs : passeurs;
-    if (store[idJoueur]) store[idJoueur].nb++;
-    else store[idJoueur] = { nom: nomJoueur, nb: 1 };
-    rafraichirTags(type);
+function ajouterJoueur(type, id, nom) {
+    var liste = type === 'but' ? buteurs : passeurs;
+    if (liste[id]) liste[id].nb++;
+    else liste[id] = { nom: nom, nb: 1 };
+    rafraichirListe(type);
 }
 
-function retirerTag(type, idJoueur) {
-    var store = type === 'but' ? buteurs : passeurs;
-    delete store[idJoueur];
-    rafraichirTags(type);
+function retirerJoueur(type, id) {
+    var liste = type === 'but' ? buteurs : passeurs;
+    delete liste[id];
+    rafraichirListe(type);
 }
 
-function rafraichirTags(type) {
-    var store  = type === 'but' ? buteurs : passeurs;
-    var contId = type === 'but' ? 'tags-buteurs' : 'tags-passeurs';
-    var cont   = document.getElementById(contId);
-    if (!cont) return;
-    cont.innerHTML = '';
-    Object.keys(store).forEach(function(id) {
-        var item = store[id];
+function rafraichirListe(type) {
+    var liste  = type === 'but' ? buteurs : passeurs;
+    var zoneId = type === 'but' ? 'liste-buteurs' : 'liste-passeurs';
+    var zone   = document.getElementById(zoneId);
+    if (!zone) return;
+    zone.innerHTML = '';
+    Object.keys(liste).forEach(function(id) {
+        var item = liste[id];
         var tag  = document.createElement('span');
         tag.className = 'badge badge--rating';
-        tag.innerHTML = item.nom + (item.nb > 1 ? ' &times;'+item.nb : '') +
-            ' <button type="button" onclick="retirerTag(\''+type+'\',\''+id+'\')">×</button>';
-        cont.appendChild(tag);
+        tag.innerHTML = item.nom + (item.nb > 1 ? ' x'+item.nb : '') +
+            ' <button type="button" onclick="retirerJoueur(\''+type+'\',\''+id+'\')">x</button>';
+        zone.appendChild(tag);
     });
 }
 
-function bindForms(idMatch) {
+function initialiserFormulaire(idMatch) {
     buteurs  = {};
     passeurs = {};
 
@@ -250,7 +241,7 @@ function bindForms(idMatch) {
             e.stopPropagation();
             var sel = document.getElementById('sel-but');
             if (!sel.value) return;
-            ajouterTag('but', sel.value, sel.options[sel.selectedIndex].text);
+            ajouterJoueur('but', sel.value, sel.options[sel.selectedIndex].text);
         });
     }
 
@@ -260,67 +251,87 @@ function bindForms(idMatch) {
             e.stopPropagation();
             var sel = document.getElementById('sel-pas');
             if (!sel.value) return;
-            ajouterTag('passe', sel.value, sel.options[sel.selectedIndex].text);
+            ajouterJoueur('passe', sel.value, sel.options[sel.selectedIndex].text);
         });
     }
 
-    var formScore = document.getElementById('form-score');
-    if (formScore) {
-        formScore.addEventListener('submit', function(e) {
+    var form = document.getElementById('form-score');
+    if (form) {
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            var scoreDom  = parseInt(document.getElementById('inp-score-dom').value) || 0;
-            var scoreExt  = parseInt(document.getElementById('inp-score-ext').value) || 0;
-            var nbButs    = Object.values(buteurs).reduce(function(s,b){ return s+b.nb; }, 0);
-            var totalButs = scoreDom + scoreExt;
+            var scoreDom = parseInt(document.getElementById('inp-score-dom').value) || 0;
+            var scoreExt = parseInt(document.getElementById('inp-score-ext').value) || 0;
+            var nbButs   = Object.values(buteurs).reduce(function(s,b){ return s+b.nb; }, 0);
+            var total    = scoreDom + scoreExt;
 
-            if (nbButs > 0 && nbButs !== totalButs) {
-                if (!confirm('Le nombre de buteurs ('+nbButs+') ne correspond pas au score total ('+totalButs+'). Continuer quand même ?'))
+            if (nbButs > 0 && nbButs !== total) {
+                if (!confirm('Le nombre de buteurs ('+nbButs+') ne correspond pas au score ('+total+'). Continuer ?'))
                     return;
             }
 
-            var data = new FormData();
-            data.append('action', 'Maj score');
-            data.append('idMatch', idMatch);
-            data.append('score_dom', scoreDom);
-            data.append('score_ext', scoreExt);
+  
+            var dataScore = new FormData();
+            dataScore.append('action', 'Maj score');
+            dataScore.append('idMatch', idMatch);
+            dataScore.append('score_dom', scoreDom);
+            dataScore.append('score_ext', scoreExt);
+            envoyer(dataScore, function() {});
 
+    
             Object.keys(buteurs).forEach(function(id) {
-                for (var i = 0; i < buteurs[id].nb; i++)
-                    data.append('buteurs[]', id);
-            });
-            Object.keys(passeurs).forEach(function(id) {
-                for (var i = 0; i < passeurs[id].nb; i++)
-                    data.append('passeurs[]', id);
+                for (var i = 0; i < buteurs[id].nb; i++) {
+                    var dataBut = new FormData();
+                    dataBut.append('action', 'Ajouter but');
+                    dataBut.append('idMatch', idMatch);
+                    dataBut.append('idJoueur', id);
+                    envoyer(dataBut, function() {});
+                }
             });
 
-			envoyer(data, function(res) {
-				if (res.ok) {
-					window.location.href = 'index.php?view=scores';
-				} else {
-					showToast(res.msg, false);
-				}
-			});
+ 
+            Object.keys(passeurs).forEach(function(id) {
+                for (var i = 0; i < passeurs[id].nb; i++) {
+                    var dataPas = new FormData();
+                    dataPas.append('action', 'Ajouter passe');
+                    dataPas.append('idMatch', idMatch);
+                    dataPas.append('idJoueur', id);
+                    envoyer(dataPas, function() {});
+                }
+            });
+
+        
+            var selHdm = document.getElementById('sel-hdm');
+            if (selHdm && selHdm.value) {
+                var dataHdm = new FormData();
+                dataHdm.append('action', 'Maj hdm');
+                dataHdm.append('idMatch', idMatch);
+                dataHdm.append('idJoueur', selHdm.value);
+                envoyer(dataHdm, function() {});
+            }
+
+            setTimeout(function() {
+                window.location.href = 'index.php?view=scores';
+            }, 500);
         });
     }
 }
 
-function envoyer(data, callback) {
+function envoyer(data, retour) {
     fetch('controleur.php', {
         method: 'POST',
         body: data,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(function(r) { return r.json(); })
-    .then(callback);
+    .then(retour);
 }
 
 function filtrerSelect(inputId, selectId) {
     var filtre = document.getElementById(inputId).value.toLowerCase();
     var options = document.getElementById(selectId).options;
     for (var i = 0; i < options.length; i++) {
-        var texte = options[i].text.toLowerCase();
-        options[i].style.display = texte.includes(filtre) ? '' : 'none';
+        options[i].style.display = options[i].text.toLowerCase().includes(filtre) ? '' : 'none';
     }
 }
 </script>
