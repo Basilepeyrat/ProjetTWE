@@ -1,4 +1,5 @@
 <?php
+//basile: ce fichier permet de récuperer les nouveaux chats dans la league ou dans les commentaires d'un match 
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . "/../libs/maLibUtils.php";

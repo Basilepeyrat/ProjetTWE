@@ -92,24 +92,7 @@ if ($idMatch && $isAjax) {
     exit;
 }
 
-$tousLesMatchs = listerMatchsTroisJours();
-
-$hier       = date('Y-m-d', strtotime('-1 day'));
-$aujourdhui = date('Y-m-d');
-$demain     = date('Y-m-d', strtotime('+1 day'));
-
-$colonnes = [
-    'Hier'        => [],
-    "Aujourd'hui" => [],
-    'Demain'      => [],
-];
-
-foreach ($tousLesMatchs as $match) {
-    $date = date('Y-m-d', strtotime($match['date_match']));
-    if ($date === $hier)           $colonnes['Hier'][]        = $match;
-    elseif ($date === $aujourdhui) $colonnes["Aujourd'hui"][] = $match;
-    elseif ($date === $demain)     $colonnes['Demain'][]      = $match;
-}
+$tousLesMatchs = listerTousLesMatchs();
 ?>
 
 <div class="top-bar">
@@ -121,41 +104,50 @@ foreach ($tousLesMatchs as $match) {
 
     <div id="message" class="mt-sm"></div>
 
-    <div class="dashboard-matchs">
-    <?php foreach ($colonnes as $titre => $matchs): ?>
-        <div class="colonne-matchs">
-            <h2><?= $titre ?></h2>
-            <?php if (empty($matchs)): ?>
-                <p class="text-muted">Aucun match</p>
-            <?php else: ?>
-                <?php foreach ($matchs as $m):
-                    $scoreSet = ($m['score_dom'] !== null && $m['score_ext'] !== null);
-                    $score    = $scoreSet ? $m['score_dom'].' - '.$m['score_ext'] : '? - ?';
-                ?>
-                    <div class="card match-card"
-                         data-nom="<?= htmlspecialchars(strtolower($m['equipe_dom'].' '.$m['equipe_ext'])) ?>"
-                         onclick="ouvrirFermer(this, <?= $m['id'] ?>)">
-                        <div class="match-card__score">
-                            <div class="match-card__team"><?= htmlspecialchars($m['equipe_dom']) ?></div>
-                            <div class="match-card__value">
-                                <span class="badge <?= $scoreSet ? 'badge--success' : 'badge--rating' ?>">
-                                    <?= $score ?>
-                                </span>
-                            </div>
-                            <div class="match-card__team"><?= htmlspecialchars($m['equipe_ext']) ?></div>
-                        </div>
-                        <div class="match-card__date"><?= date('H:i', strtotime($m['date_match'])) ?></div>
-                    </div>
-                    <div class="card panneau" id="panneau-<?= $m['id'] ?>"
-                         style="display:none;"
-                         onclick="event.stopPropagation()">
-                        <p class="text-muted">Chargement...</p>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+    <?php
+    // affichage de TOUS les matchs, groupés par date (comme l'accueil)
+    $aujourdhui   = date('Y-m-d');
+    $dateCourante = null;
+    foreach ($tousLesMatchs as $m):
+        $jour = date('Y-m-d', strtotime($m['date_match']));
+        if ($jour !== $dateCourante):
+            $dateCourante  = $jour;
+            $estAujourdhui = ($jour === $aujourdhui);
+    ?>
+        <h2 <?= $estAujourdhui ? 'id="aujourdhui"' : '' ?>>
+            <?= $estAujourdhui ? "Aujourd'hui" : date('d/m/Y', strtotime($jour)) ?>
+        </h2>
+    <?php endif; ?>
+
+        <?php
+        $scoreSet = ($m['score_dom'] !== null && $m['score_ext'] !== null);
+        $score    = $scoreSet ? $m['score_dom'].' - '.$m['score_ext'] : '? - ?';
+        ?>
+        <div class="card match-card"
+             data-nom="<?= htmlspecialchars(strtolower($m['equipe_dom'].' '.$m['equipe_ext'])) ?>"
+             onclick="ouvrirFermer(this, <?= $m['id'] ?>)">
+            <div class="match-card__score">
+                <div class="match-card__team"><?= htmlspecialchars($m['equipe_dom']) ?></div>
+                <div class="match-card__value">
+                    <span class="badge <?= $scoreSet ? 'badge--success' : 'badge--rating' ?>">
+                        <?= $score ?>
+                    </span>
+                </div>
+                <div class="match-card__team"><?= htmlspecialchars($m['equipe_ext']) ?></div>
+            </div>
+            <div class="match-card__date"><?= date('H:i', strtotime($m['date_match'])) ?></div>
         </div>
+        <div class="card panneau" id="panneau-<?= $m['id'] ?>"
+             style="display:none;"
+             onclick="event.stopPropagation()">
+            <p class="text-muted">Chargement...</p>
+        </div>
+
     <?php endforeach; ?>
-    </div>
+
+    <?php if (count($tousLesMatchs) == 0): ?>
+        <p class="text-muted">Aucun match.</p>
+    <?php endif; ?>
 
 </div>
 

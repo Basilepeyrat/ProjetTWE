@@ -1,5 +1,5 @@
 <?php
-
+//basile: cette page permet d'afficher les leagues d'un utilisateur et de recherher ou de créer une nouvelle league
 if (basename($_SERVER["PHP_SELF"]) == "leagues.php") {
 	header("Location:../index.php?view=leagues");
 	die("");

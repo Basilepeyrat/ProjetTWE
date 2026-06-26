@@ -1,5 +1,6 @@
 
 <?php
+//basile: cette page permet d'afficher les statistiques d'une league avec le bouton de retour vers les leagues et un bouton de paramètre pour le créateur de la league
 if (basename($_SERVER["PHP_SELF"]) == "league.php") {
 	header("Location:../index.php?view=leagues");
 	die("");
@@ -31,9 +32,9 @@ marquerLeagueLue($idUser, $idLeague);
 -->
 <div class="page-entete">
 	<?php if ($league['createur_id'] == $idUser) : ?>
-		<a class="reglages" href="index.php?view=demandes&amp;idLeague=<?php echo $league['id']; ?>" aria-label="Gérer les demandes">⚙</a>
+		<a class="reglages" href="index.php?view=demandes&amp;idLeague=<?php echo $league['id']; ?>" aria-label="Gérer les demandes"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-icon lucide-settings"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg></a>
 		<?php endif; ?>
-	<a class="retour" href="index.php?view=leagues" aria-label="Retour">←</a>
+	<a class="retour" href="index.php?view=leagues" aria-label="Retour"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move-left-icon lucide-move-left"><path d="M6 8L2 12L6 16"/><path d="M2 12H22"/></svg></a>
 	<h1 class="lg-titre"><?php echo htmlspecialchars($league['nom']); ?> - Id:<?php echo $league['id']; ?></h1>
 </div>
 
