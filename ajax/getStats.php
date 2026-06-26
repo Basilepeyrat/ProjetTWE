@@ -22,7 +22,7 @@ if (isset($_GET['equipe_id']) && $_GET['equipe_id'] != "") {
         "gagnes" => $stats['gagnes'],
         "nuls" => $stats['nuls'],
         "perdus" => $stats['perdus'],
-        "moyenne" => round($note['moyenne'],2),
+        "moyenne" => $note['moyenne'] !== null ? round($note['moyenne'], 2) : "N/A",
         "mvp" => $mvp ? $mvp['prenom']." ".$mvp['nom'] : "Aucun",
         "fans" => $fans['nb'],
 
