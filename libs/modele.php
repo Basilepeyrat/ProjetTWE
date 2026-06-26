@@ -643,7 +643,7 @@ function listerCommentairesDepuis($idMatch, $depuisId)
 	return parcoursRs(SQLSelect($SQL));
 }
 
-// nombre total (pour savoir s'il reste des commentaires à charger)
+// Basile: cette fonction est un vestige ou l'on voulait afficher les commentaires 5 par 5 elle affiche le nombre total de commentaire
 function compterCommentaires($idMatch)
 {
 	return SQLGetChamp("SELECT COUNT(*) FROM COMMENTAIRE WHERE match_id = '$idMatch'");
