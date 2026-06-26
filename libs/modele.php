@@ -339,7 +339,7 @@ function getMeilleurPasseurEquipe($idEquipe)
         return false;
 
     return $res[0];
-]
+}
 	
 //eleonore-fin
 
