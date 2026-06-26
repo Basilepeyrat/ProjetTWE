@@ -12,6 +12,10 @@ if (isset($_GET['equipe_id']) && $_GET['equipe_id'] != "") {
     $note = getNoteMoyenne($id);
     $mvp = getMVP($id);
 
+    $fans = getNbFansEquipe($id);
+    $buteur = getMeilleurButeurEquipe($id);
+    $passeur = getMeilleurPasseurEquipe($id);
+
     echo json_encode(array(
         "type" => "equipe",
         "joues" => $stats['joues'],
@@ -19,7 +23,24 @@ if (isset($_GET['equipe_id']) && $_GET['equipe_id'] != "") {
         "nuls" => $stats['nuls'],
         "perdus" => $stats['perdus'],
         "moyenne" => round($note['moyenne'],2),
-        "mvp" => $mvp ? $mvp['prenom']." ".$mvp['nom'] : "Aucun"
+        "mvp" => $mvp ? $mvp['prenom']." ".$mvp['nom'] : "Aucun",
+        "fans" => $fans['nb'],
+
+    "buteur" => $buteur
+        ? $buteur['prenom']." ".$buteur['nom']
+        : "Aucun",
+
+    "nbButs" => $buteur
+        ? $buteur['nb_buts']
+        : 0,
+
+    "passeur" => $passeur
+        ? $passeur['prenom']." ".$passeur['nom']
+        : "Aucun",
+
+    "nbPasses" => $passeur
+        ? $passeur['nb_passes']
+        : 0,
     ));
 
 }

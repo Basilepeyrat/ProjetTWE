@@ -86,6 +86,13 @@ function chargerStats(idEquipe = ""){
                 <p>Note moyenne : ${data.moyenne}</p>
 
                 <p>MVP le plus choisi : ${data.mvp}</p>
+                
+                <p><b>Nombre de fans :</b> ${data.fans}</p>
+
+                <p><b>Meilleur buteur :</b> ${data.buteur} (${data.nbButs} buts)</p>
+
+                <p><b>Meilleur passeur :</b> ${data.passeur} (${data.nbPasses} passes)</p>
+
                 `;
 
             }

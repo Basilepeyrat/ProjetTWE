@@ -318,6 +318,53 @@ function getMeilleurPasseur()
     return count($res) ? $res[0] : null;
 }
 
+function getNbFansEquipe($idEquipe)
+{
+    $sql = "SELECT COUNT(*) AS nb
+            FROM UTILISATEUR
+            WHERE equipe_pref_id = $idEquipe";
+
+    $res = parcoursRS(SQLSelect($sql));
+    return $res[0];
+}
+
+function getMeilleurButeurEquipe($idEquipe)
+{
+    $sql = "SELECT J.prenom, J.nom, COUNT(*) AS nb_buts
+            FROM BUT B
+            JOIN JOUEUR J ON J.id = B.buteur_id
+            WHERE J.equipe_id = $idEquipe
+            GROUP BY J.id
+            ORDER BY nb_buts DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+
+    if (count($res) == 0)
+        return false;
+
+    return $res[0];
+}
+
+
+function getMeilleurPasseurEquipe($idEquipe)
+{
+    $sql = "SELECT J.prenom, J.nom, COUNT(*) AS nb_passes
+            FROM BUT B
+            JOIN JOUEUR J ON J.id = B.passeur_id
+            WHERE J.equipe_id = $idEquipe
+            GROUP BY J.id
+            ORDER BY nb_passes DESC
+            LIMIT 1";
+
+    $res = parcoursRS(SQLSelect($sql));
+
+    if (count($res) == 0)
+        return false;
+
+    return $res[0];
+}
+
 //eleonore-fin
 
 function getMatchs(int $userId, string $filtreEquipe = '', string $filtrePoule = ''): array {

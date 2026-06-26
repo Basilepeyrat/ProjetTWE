@@ -48,7 +48,7 @@ if ($idMatch && $isAjax) {
         </div>
         <div id="tags-buteurs" class="mt-sm"></div>
 
-        <p class="text-muted mt-md"><strong>🎯 Passeurs décisifs</strong></p>
+        <p class="text-muted mt-md"><strong>Passeurs décisifs</strong></p>
         <input type="text" id="filtre-pas" placeholder="Tapez pour filtrer..."
                oninput="filtrerSelect('filtre-pas','sel-pas')" />
         <div style="display:flex;gap:8px;">
@@ -64,7 +64,7 @@ if ($idMatch && $isAjax) {
         </div>
         <div id="tags-passeurs" class="mt-sm"></div>
 
-        <p class="text-muted mt-md"><strong>🏆 Homme du match FIFA</strong></p>
+        <p class="text-muted mt-md"><strong>Homme du match FIFA</strong></p>
         <?php if ($m['mvpfifa_id'] > 0 && $m['hdm_nom']): ?>
             <p>
                 <span class="badge badge--success">✓ <?= htmlspecialchars($m['hdm_nom']) ?></span>
