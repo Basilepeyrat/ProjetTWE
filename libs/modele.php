@@ -287,15 +287,8 @@ function getEquipePlusButs()
 
 function getMeilleurButeur()
 {
-    $sql = "SELECT
-                J.prenom,
-                J.nom,
-                COUNT(*) AS nb_buts
-            FROM BUT B
-            JOIN JOUEUR J ON J.id = B.buteur_id
-            GROUP BY J.id
-            ORDER BY nb_buts DESC
-            LIMIT 1";
+    $sql = "SELECT prenom, nom, buts AS nb_buts FROM JOUEUR
+            WHERE buts > 0 ORDER BY buts DESC LIMIT 1";
 
     $res = parcoursRS(SQLSelect($sql));
     return count($res) ? $res[0] : null;
@@ -303,17 +296,8 @@ function getMeilleurButeur()
 
 function getMeilleurPasseur()
 {
-    $sql = "SELECT
-                J.prenom,
-                J.nom,
-                COUNT(*) AS nb_passes
-            FROM BUT B
-            JOIN JOUEUR J ON J.id = B.passeur_id
-            WHERE B.passeur_id IS NOT NULL
-            GROUP BY J.id
-            ORDER BY nb_passes DESC
-            LIMIT 1";
-
+            $sql = "SELECT prenom, nom, passe_dec AS nb_passes FROM JOUEUR
+            WHERE passe_dec > 0 ORDER BY passe_dec DESC LIMIT 1";
     $res = parcoursRS(SQLSelect($sql));
     return count($res) ? $res[0] : null;
 }
@@ -330,13 +314,9 @@ function getNbFansEquipe($idEquipe)
 
 function getMeilleurButeurEquipe($idEquipe)
 {
-    $sql = "SELECT J.prenom, J.nom, COUNT(*) AS nb_buts
-            FROM BUT B
-            JOIN JOUEUR J ON J.id = B.buteur_id
-            WHERE J.equipe_id = $idEquipe
-            GROUP BY J.id
-            ORDER BY nb_buts DESC
-            LIMIT 1";
+    $sql = "SELECT prenom, nom, buts AS nb_buts FROM JOUEUR
+            WHERE equipe_id = $idEquipe AND buts > 0
+            ORDER BY buts DESC LIMIT 1";
 
     $res = parcoursRS(SQLSelect($sql));
 
@@ -349,13 +329,9 @@ function getMeilleurButeurEquipe($idEquipe)
 
 function getMeilleurPasseurEquipe($idEquipe)
 {
-    $sql = "SELECT J.prenom, J.nom, COUNT(*) AS nb_passes
-            FROM BUT B
-            JOIN JOUEUR J ON J.id = B.passeur_id
-            WHERE J.equipe_id = $idEquipe
-            GROUP BY J.id
-            ORDER BY nb_passes DESC
-            LIMIT 1";
+    $sql = "SELECT prenom, nom, passe_dec AS nb_passes FROM JOUEUR
+            WHERE equipe_id = $idEquipe AND passe_dec > 0
+            ORDER BY passe_dec DESC LIMIT 1";
 
     $res = parcoursRS(SQLSelect($sql));
 
@@ -363,8 +339,8 @@ function getMeilleurPasseurEquipe($idEquipe)
         return false;
 
     return $res[0];
-}
-
+]
+	
 //eleonore-fin
 
 function getMatchs(int $userId, string $filtreEquipe = '', string $filtrePoule = ''): array {
